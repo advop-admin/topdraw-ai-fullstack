@@ -1,6 +1,6 @@
 """
 ChromaDB service for vector similarity search
-Supports both local container and cloud deployment
+Updated for better compatibility with ChromaDB server
 """
 
 import chromadb
@@ -8,6 +8,7 @@ from chromadb.config import Settings as ChromaSettings
 import logging
 from typing import List, Dict, Any, Optional
 import json
+import time
 
 from ..config.settings import get_settings
 from ..models.schemas import ProjectMatchSchema, ScrapedDataSchema
@@ -23,39 +24,56 @@ class ChromaService:
             self.connection_info = settings.chroma_connection_info
             logger.info(f"Initializing ChromaDB connection: {self.connection_info['type']}")
             
-            # Configure ChromaDB client based on deployment type
-            if settings.is_chroma_cloud:
-                # Cloud configuration
-                logger.info(f"Connecting to ChromaDB Cloud at {settings.chroma_host}:{settings.chroma_port}")
-                self.client = chromadb.HttpClient(
-                    host=settings.chroma_host,
-                    port=settings.chroma_port,
-                    headers=self.connection_info["headers"]
-                )
-            else:
-                # Local container configuration
-                logger.info(f"Connecting to ChromaDB container at {settings.chroma_host}:{settings.chroma_port}")
-                self.client = chromadb.HttpClient(
-                    host=settings.chroma_host,
-                    port=settings.chroma_port
-                )
-            
-            # Get or create collection
-            try:
-                self.collection = self.client.get_collection(settings.chroma_collection_name)
-                logger.info(f"Connected to existing collection: {settings.chroma_collection_name}")
-            except Exception as e:
-                logger.info(f"Collection not found, creating new one: {settings.chroma_collection_name}")
-                self.collection = self.client.create_collection(
-                    name=settings.chroma_collection_name,
-                    metadata={
-                        "description": "QBurst project embeddings for proposal generation",
-                        "created_by": "Takumi.ai BDT Dashboard",
-                        "deployment_type": self.connection_info["type"]
-                    }
-                )
-                logger.info(f"Created new collection: {settings.chroma_collection_name}")
-                
+            # Configure ChromaDB client with retries
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    if settings.is_chroma_cloud:
+                        # Cloud configuration
+                        logger.info(f"Connecting to ChromaDB Cloud at {settings.chroma_host}:{settings.chroma_port}")
+                        self.client = chromadb.HttpClient(
+                            host=settings.chroma_host,
+                            port=settings.chroma_port,
+                            headers=self.connection_info["headers"]
+                        )
+                    else:
+                        # Local container configuration
+                        logger.info(f"Connecting to ChromaDB container at {settings.chroma_host}:{settings.chroma_port}")
+                        self.client = chromadb.HttpClient(
+                            host=settings.chroma_host,
+                            port=settings.chroma_port,
+                            settings=ChromaSettings(
+                                anonymized_telemetry=False,
+                                allow_reset=True
+                            )
+                        )
+                    
+                    # Test connection by trying to get or create collection
+                    try:
+                        self.collection = self.client.get_collection(settings.chroma_collection_name)
+                        logger.info(f"Connected to existing collection: {settings.chroma_collection_name}")
+                        break
+                    except Exception as e:
+                        logger.info(f"Collection not found, creating new one: {settings.chroma_collection_name}")
+                        self.collection = self.client.create_collection(
+                            name=settings.chroma_collection_name,
+                            metadata={
+                                "description": "QBurst project embeddings for proposal generation",
+                                "created_by": "Takumi.ai BDT Dashboard",
+                                "deployment_type": self.connection_info["type"]
+                            }
+                        )
+                        logger.info(f"Created new collection: {settings.chroma_collection_name}")
+                        break
+                        
+                except Exception as e:
+                    if attempt < max_retries - 1:
+                        logger.warning(f"Connection attempt {attempt + 1} failed: {e}")
+                        logger.info("Retrying in 5 seconds...")
+                        time.sleep(5)
+                    else:
+                        raise e
+                        
         except Exception as e:
             logger.error(f"Failed to initialize ChromaDB ({self.connection_info.get('type', 'unknown')}): {e}")
             raise

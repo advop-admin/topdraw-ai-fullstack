@@ -4,7 +4,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3001:3000"  # Different port to avoid conflicts with PM system
+      - "3001:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -25,15 +25,15 @@ services:
       - PYTHONPATH=/app
     depends_on:
       - chroma
-    # NOTE: No database dependency - connects to external database via DATABASE_URL
 
   chroma:
-    image: ghcr.io/chroma-core/chroma:latest
+    image: ghcr.io/chroma-core/chroma:0.5.20
     ports:
-      - "8001:8000"  # Different port to avoid conflicts
+      - "8001:8000"
     environment:
       - CHROMA_SERVER_HOST=0.0.0.0
       - CHROMA_SERVER_HTTP_PORT=8000
+      - ANONYMIZED_TELEMETRY=False
     volumes:
       - chroma_data:/chroma/chroma
 
