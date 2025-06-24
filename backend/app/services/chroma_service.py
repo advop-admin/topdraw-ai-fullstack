@@ -1,9 +1,10 @@
 """
 ChromaDB service for vector similarity search
+Supports both local container and cloud deployment
 """
 
 import chromadb
-from chromadb.config import Settings
+from chromadb.config import Settings as ChromaSettings
 import logging
 from typing import List, Dict, Any, Optional
 import json
@@ -15,20 +16,25 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 class ChromaService:
-    """Service for interacting with ChromaDB"""
+    """Service for interacting with ChromaDB (container or cloud)"""
     
     def __init__(self):
         try:
-            # Configure ChromaDB client
-            if settings.chroma_api_key:
+            self.connection_info = settings.chroma_connection_info
+            logger.info(f"Initializing ChromaDB connection: {self.connection_info['type']}")
+            
+            # Configure ChromaDB client based on deployment type
+            if settings.is_chroma_cloud:
                 # Cloud configuration
+                logger.info(f"Connecting to ChromaDB Cloud at {settings.chroma_host}:{settings.chroma_port}")
                 self.client = chromadb.HttpClient(
                     host=settings.chroma_host,
                     port=settings.chroma_port,
-                    headers={"Authorization": f"Bearer {settings.chroma_api_key}"}
+                    headers=self.connection_info["headers"]
                 )
             else:
-                # Local configuration
+                # Local container configuration
+                logger.info(f"Connecting to ChromaDB container at {settings.chroma_host}:{settings.chroma_port}")
                 self.client = chromadb.HttpClient(
                     host=settings.chroma_host,
                     port=settings.chroma_port
@@ -38,15 +44,20 @@ class ChromaService:
             try:
                 self.collection = self.client.get_collection(settings.chroma_collection_name)
                 logger.info(f"Connected to existing collection: {settings.chroma_collection_name}")
-            except:
+            except Exception as e:
+                logger.info(f"Collection not found, creating new one: {settings.chroma_collection_name}")
                 self.collection = self.client.create_collection(
                     name=settings.chroma_collection_name,
-                    metadata={"description": "QBurst project embeddings for proposal generation"}
+                    metadata={
+                        "description": "QBurst project embeddings for proposal generation",
+                        "created_by": "Takumi.ai BDT Dashboard",
+                        "deployment_type": self.connection_info["type"]
+                    }
                 )
                 logger.info(f"Created new collection: {settings.chroma_collection_name}")
                 
         except Exception as e:
-            logger.error(f"Failed to initialize ChromaDB: {e}")
+            logger.error(f"Failed to initialize ChromaDB ({self.connection_info.get('type', 'unknown')}): {e}")
             raise
     
     def find_similar_projects(
@@ -59,6 +70,7 @@ class ChromaService:
         try:
             # Create query text from client data
             query_text = self._create_search_query(scraped_data)
+            logger.info(f"Searching for projects with query: {query_text[:100]}...")
             
             # Search for similar projects
             results = self.collection.query(
@@ -70,6 +82,8 @@ class ChromaService:
             # Process results
             projects = []
             if results['documents'] and results['documents'][0]:
+                logger.info(f"Found {len(results['documents'][0])} potential matches")
+                
                 for i, doc in enumerate(results['documents'][0]):
                     metadata = results['metadatas'][0][i]
                     distance = results['distances'][0][i]
@@ -78,29 +92,48 @@ class ChromaService:
                     similarity_score = max(0, 1 - distance)
                     
                     try:
+                        # Parse JSON fields safely
+                        tech_stack = {}
+                        key_features = []
+                        
+                        if metadata.get('tech_stack'):
+                            try:
+                                tech_stack = json.loads(metadata['tech_stack'])
+                            except json.JSONDecodeError:
+                                tech_stack = {}
+                        
+                        if metadata.get('key_features'):
+                            try:
+                                key_features = json.loads(metadata['key_features'])
+                            except json.JSONDecodeError:
+                                key_features = []
+                        
                         project = ProjectMatchSchema(
                             id=metadata.get('id', f'project_{i}'),
                             project_name=metadata.get('project_name', 'Unknown Project'),
                             project_description=metadata.get('project_description', ''),
                             industry_vertical=metadata.get('industry_vertical', ''),
                             client_type=metadata.get('client_type', ''),
-                            tech_stack=json.loads(metadata.get('tech_stack', '{}')),
+                            tech_stack=tech_stack,
                             similarity_score=similarity_score,
-                            key_features=json.loads(metadata.get('key_features', '[]')),
+                            key_features=key_features,
                             business_impact=metadata.get('business_impact', ''),
                             project_duration=metadata.get('project_duration'),
-                            team_size=metadata.get('team_size'),
+                            team_size=int(metadata.get('team_size', 0)) if metadata.get('team_size') else None,
                             budget_range=metadata.get('budget_range')
                         )
                         projects.append(project)
+                        
                     except Exception as e:
                         logger.warning(f"Error processing project result {i}: {e}")
                         continue
+            else:
+                logger.info("No matching projects found")
             
             # Sort by similarity score
             projects.sort(key=lambda x: x.similarity_score, reverse=True)
             
-            logger.info(f"Found {len(projects)} similar projects")
+            logger.info(f"Returning {len(projects)} similar projects")
             return projects
             
         except Exception as e:
@@ -132,7 +165,8 @@ class ChromaService:
         if scraped_data.company_size:
             query_parts.append(f"Company size: {scraped_data.company_size}")
         
-        return " ".join(query_parts)
+        query = " ".join(query_parts)
+        return query if query else "general business software development"
     
     def get_collection_stats(self) -> Dict[str, Any]:
         """Get collection statistics"""
@@ -141,13 +175,19 @@ class ChromaService:
             return {
                 "collection_name": settings.chroma_collection_name,
                 "document_count": count,
-                "status": "connected"
+                "deployment_type": self.connection_info["type"],
+                "status": "connected",
+                "host": settings.chroma_host,
+                "port": settings.chroma_port
             }
         except Exception as e:
             logger.error(f"Error getting collection stats: {e}")
             return {
                 "collection_name": settings.chroma_collection_name,
                 "document_count": 0,
+                "deployment_type": self.connection_info.get("type", "unknown"),
                 "status": "error",
-                "error": str(e)
+                "error": str(e),
+                "host": settings.chroma_host,
+                "port": settings.chroma_port
             } 

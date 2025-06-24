@@ -15,7 +15,7 @@ An AI-powered dashboard for QBurst's Business Development Team (BDT) to analyze 
 - **Frontend**: React with TypeScript, Tailwind CSS, React Quill editor
 - **Backend**: FastAPI with Python, integrates Gemini AI and ChromaDB
 - **Vector Database**: ChromaDB for semantic project matching
-- **Data Source**: Reads from the existing Takumi.ai Project Management System's PostgreSQL database (no separate DB required)
+- **Data Source**: Connects to Takumi.ai Project Management System's PostgreSQL database via DATABASE_URL
 - **Containerization**: Docker & Docker Compose for easy deployment
 
 ## 📋 Prerequisites
@@ -26,56 +26,112 @@ An AI-powered dashboard for QBurst's Business Development Team (BDT) to analyze 
 
 2. **Docker & Docker Compose** installed on your system
 
-3. **Access to the Takumi.ai PM PostgreSQL database** (used for project data vectorization)
+3. **Access to the Takumi.ai PM PostgreSQL database** (local or cloud)
 
 ## 🛠️ Quick Setup
 
 ### 1. Configure Environment
 ```bash
 cp env.example .env
-# Edit .env file with your API keys and database credentials for the existing PostgreSQL
+# Edit .env file with your API keys and database connection
 ```
 
-Required environment variables:
+### 2. Database Configuration Options
+
+**Option A: DATABASE_URL (Recommended - Cloud Ready)**
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
-CHROMA_HOST=chroma
-CHROMA_PORT=8001
-POSTGRES_HOST=postgres
+# For local Takumi.ai PM system
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/takumi_pm
+
+# For cloud database (AWS RDS, Google Cloud SQL, etc.)
+DATABASE_URL=postgresql://username:password@your-cloud-db-host:5432/takumi_pm
+
+# For Railway/Heroku
+DATABASE_URL=postgresql://user:pass@hostname:port/database
+```
+
+**Option B: Individual Parameters (Fallback)**
+```env
+POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_DB=takumi_pm
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_password
+POSTGRES_PASSWORD=postgres
 ```
 
-### 2. Vectorize Your Project Data
+### 3. Complete Environment Configuration
+```env
+# Required API Keys
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# ChromaDB Configuration
+CHROMA_HOST=localhost
+CHROMA_PORT=8001
+
+# Database Connection (Choose one approach)
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/takumi_pm
+
+# App Configuration
+REACT_APP_API_URL=http://localhost:8000
+```
+
+### 4. Vectorize Your Project Data
 ```bash
 # Install Python dependencies
 cd backend
 pip install -r requirements.txt
 
-# Run vectorization script (reads from Takumi.ai PM PostgreSQL)
+# Run vectorization script (reads from DATABASE_URL)
 python scripts/vectorize_projects.py
 ```
 
-### 3. Start the Application
+### 5. Start the Application
 ```bash
 # From project root
 docker-compose up --build
 ```
 
 The application will be available at:
-- Frontend: http://localhost:3001
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
+- **Frontend**: http://localhost:3001 (Note: Different port from PM system)
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
 
-## 📊 Database Schema
+## 🌐 Cloud Database Support
 
-The Takumi.ai PM PostgreSQL database should have a `projects` table with these columns:
+This system is designed to work with various database configurations:
+
+### **Local Development**
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/takumi_pm
+```
+
+### **AWS RDS**
+```env
+DATABASE_URL=postgresql://username:password@your-rds-endpoint.amazonaws.com:5432/takumi_pm
+```
+
+### **Google Cloud SQL**
+```env
+DATABASE_URL=postgresql://username:password@your-cloud-sql-ip:5432/takumi_pm
+```
+
+### **Railway/Heroku**
+```env
+DATABASE_URL=$DATABASE_URL  # Automatically provided by platform
+```
+
+### **Neon/Supabase/PlanetScale**
+```env
+DATABASE_URL=postgresql://username:password@your-provider-host:5432/database_name
+```
+
+## 📊 Database Schema Compatibility
+
+The system expects the following table structure in your Takumi.ai PM database:
 
 ```sql
 CREATE TABLE projects (
-    id VARCHAR PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     project_name VARCHAR NOT NULL,
     project_description TEXT,
     project_type VARCHAR,
@@ -100,6 +156,27 @@ CREATE TABLE projects (
 );
 ```
 
+## 🔄 Data Synchronization
+
+### **Initial Setup**
+```bash
+# Vectorize existing projects
+python backend/scripts/vectorize_projects.py
+```
+
+### **Regular Updates**
+```bash
+# Re-vectorize when new projects are added to PM system
+python backend/scripts/vectorize_projects.py
+```
+
+### **Automated Sync (Optional)**
+Set up a cron job or webhook to automatically sync data:
+```bash
+# Add to crontab for daily sync at 2 AM
+0 2 * * * cd /path/to/project && python backend/scripts/vectorize_projects.py
+```
+
 ## 🎯 Usage
 
 ### 1. Client Analysis
@@ -109,7 +186,7 @@ CREATE TABLE projects (
 - Click "Analyze Client" to scrape and process data
 
 ### 2. Review Matches
-- View automatically matched historical projects
+- View automatically matched historical projects from your PM system
 - See similarity scores and project details
 - Review scraped client information
 
@@ -136,101 +213,120 @@ CREATE TABLE projects (
 ### Health Check
 - `GET /api/health` - API health status
 
-## 🎨 Customization
-
-### Proposal Templates
-Edit the proposal generation prompts in `backend/app/services/gemini_service.py`:
-
-```python
-def generate_proposal(self, ...):
-    prompt = f"""
-    # Customize your proposal structure here
-    # Add QBurst-specific sections
-    # Include industry-specific templates
-    """
-```
-
-### Matching Logic
-Modify project matching criteria in `backend/app/services/chroma_service.py`:
-
-```python
-def _create_search_query(self, scraped_data):
-    # Customize how client data is converted to search queries
-    # Add weights for different matching criteria
-```
-
-### UI Styling
-Update the design in frontend components using Tailwind CSS classes.
-
 ## 🐛 Troubleshooting
 
-### Common Issues
+### Database Connection Issues
 
-1. **Gemini API Errors**
-   - Verify API key is correct
-   - Check API quota and billing
-   - Ensure stable internet connection
+**Issue**: Can't connect to database
+**Solutions**:
+1. **Check DATABASE_URL format**:
+   ```env
+   # Correct format
+   DATABASE_URL=postgresql://username:password@host:port/database
+   
+   # Common mistakes
+   DATABASE_URL=postgres://... # Use postgresql://
+   DATABASE_URL=postgresql://user@host/db # Missing password/port
+   ```
 
-2. **ChromaDB Connection Issues**
-   - For local deployment: Ensure ChromaDB container is running
-   - For cloud: Verify API key and endpoint
+2. **Test connection manually**:
+   ```bash
+   # Install psql client
+   sudo apt-get install postgresql-client
+   
+   # Test connection
+   psql $DATABASE_URL
+   ```
 
-3. **PostgreSQL Connection**
-   - Check database credentials in .env
-   - Ensure database is accessible from Docker network
-   - Verify table schema matches expected structure
+3. **For local PM system**:
+   ```bash
+   # Check PM system is running
+   docker ps | grep postgres
+   
+   # Get database details
+   docker-compose exec postgres psql -U postgres -c "\l"
+   ```
 
-4. **Frontend Build Issues**
-   - Clear node_modules: `rm -rf frontend/node_modules`
-   - Rebuild: `docker-compose up --build frontend`
+### ChromaDB Issues
 
-### Debugging
-
-Enable debug mode by setting in .env:
-```env
-DEBUG=true
-```
-
-View logs:
+**Issue**: ChromaDB connection failed
+**Solution**: Ensure ChromaDB is running on port 8001:
 ```bash
-docker-compose logs -f backend
-docker-compose logs -f frontend
+docker-compose logs chroma
 ```
 
-## 🔒 Security Notes
+### Vectorization Issues
 
-- Store API keys securely in environment variables
-- Use HTTPS in production
-- Implement rate limiting for production deployment
-- Validate and sanitize all user inputs
-- Review scraped content before proposal generation
+**Issue**: No projects found
+**Solutions**:
+1. Check database connection
+2. Verify projects table exists and has data
+3. Check for `deleted_at IS NULL` condition
 
-## 📈 Performance Tips
+### Frontend Issues
 
-1. **Batch Processing**: Vectorize projects in batches for large datasets
-2. **Caching**: Implement Redis for caching scraped data
-3. **Async Processing**: Use background tasks for time-consuming operations
-4. **Database Indexing**: Add indexes on frequently queried columns
+**Issue**: Can't reach backend
+**Solution**: Ensure backend is running on port 8000:
+```bash
+curl http://localhost:8000/api/health
+```
 
 ## 🚀 Production Deployment
 
-For production deployment:
+### **Railway Deployment**
+```bash
+# 1. Connect Railway CLI
+railway login
 
-1. Use production-grade database (managed PostgreSQL)
-2. Deploy to cloud platforms (AWS, GCP, Azure)
-3. Use ChromaDB Cloud for managed vector database
-4. Implement proper logging and monitoring
-5. Add authentication and authorization
-6. Use CDN for frontend assets
-7. Set up CI/CD pipelines
+# 2. Deploy backend
+railway up
 
-## 🤝 Contributing
+# 3. Add environment variables in Railway dashboard
+DATABASE_URL=your_cloud_database_url
+GEMINI_API_KEY=your_key
+```
 
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/new-feature`
-3. Commit changes: `git commit -am 'Add new feature'`
-4. Push to branch: `git push origin feature/new-feature`
-5. Submit pull request
+### **Vercel + PlanetScale**
+```bash
+# 1. Deploy frontend to Vercel
+vercel --prod
+
+# 2. Connect PlanetScale database
+DATABASE_URL=mysql://username:password@host/database
+
+# 3. Deploy backend to Railway/Render
+```
+
+### **AWS Deployment**
+```bash
+# 1. RDS PostgreSQL setup
+DATABASE_URL=postgresql://user:pass@rds-endpoint:5432/db
+
+# 2. ECS/Fargate deployment
+# 3. ALB with SSL termination
+```
+
+## 📈 Performance Tips
+
+1. **Database Indexing**: Add indexes for better query performance
+   ```sql
+   CREATE INDEX idx_projects_industry ON projects(industry_vertical);
+   CREATE INDEX idx_projects_client_type ON projects(client_type);
+   CREATE INDEX idx_projects_created_at ON projects(created_at);
+   ```
+
+2. **Batch Vectorization**: Process projects in batches
+3. **Connection Pooling**: Use connection pooling for production
+4. **Caching**: Implement Redis for caching scraped data
+
+## 🔒 Security Notes
+
+- Store sensitive credentials in environment variables
+- Use SSL for database connections in production
+- Implement API rate limiting
+- Validate and sanitize all user inputs
+- Use HTTPS in production
+- Review scraped content before proposal generation
 
 ## 📝 License
 
@@ -245,4 +341,4 @@ For support and questions:
 
 ---
 
-**Built with ❤️ for QBurst by Takumi.ai** - Empowering intelligent proposal generation 
+**Built with ❤️ for QBurst by Takumi.ai** - Empowering intelligent proposal generation with cloud-ready architecture

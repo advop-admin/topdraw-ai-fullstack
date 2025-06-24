@@ -4,7 +4,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3001:3000"
+      - "3001:3000"  # Different port to avoid conflicts with PM system
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -25,12 +25,12 @@ services:
       - PYTHONPATH=/app
     depends_on:
       - chroma
-    # Connects to external postgres service on the same Docker network
+    # NOTE: No database dependency - connects to external database via DATABASE_URL
 
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
     ports:
-      - "8001:8000"
+      - "8001:8000"  # Different port to avoid conflicts
     environment:
       - CHROMA_SERVER_HOST=0.0.0.0
       - CHROMA_SERVER_HTTP_PORT=8000
@@ -39,4 +39,4 @@ services:
 
 volumes:
   chroma_data:
-    driver: local 
+    driver: local
