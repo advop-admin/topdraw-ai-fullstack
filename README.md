@@ -213,6 +213,79 @@ Set up a cron job or webhook to automatically sync data:
 ### Health Check
 - `GET /api/health` - API health status
 
+## 🧩 Detailed Working Flow: /api/analyze-client
+
+This section explains the complete, step-by-step process and architecture for the `/api/analyze-client` endpoint.
+
+### 1. Request Handling
+- **Endpoint:** `POST /api/analyze-client`
+- **Input:** Form data (at minimum: `name` and `website`; optionally social URLs and screenshots)
+
+### 2. Backend Flow (Step-by-Step)
+
+#### a. API Layer (`client_analysis.py`)
+- Receives the request and parses the form data into a `ClientInfoSchema` object.
+- Calls `GeminiService.analyze_client(client_info)`.
+
+#### b. GeminiService (`gemini_service.py`)
+- **Scrapes the main website** using `requests` and `BeautifulSoup`.
+- **(If provided) Scrapes social URLs** in the same way.
+- **Extracts structured data** by sending the scraped content to Gemini AI, which returns a JSON with fields like company description, services, tech stack, size, industry, etc.
+- Returns a `ScrapedDataSchema` object.
+
+#### c. ChromaService (`chroma_service.py`)
+- Receives the `ScrapedDataSchema` and converts it into a search query string.
+- Uses the ChromaDB client to query the vector database for similar projects.
+- Returns a list of `ProjectMatchSchema` objects (project matches).
+
+#### d. Response Construction
+- The API layer returns a JSON response containing:
+  - `scraped_data` (from GeminiService)
+  - `matched_projects` (from ChromaService)
+  - `analysis_timestamp` and `processing_time`
+
+### 3. Data Storage & Persistence
+- **No client analysis data is stored or persisted.**
+  - The scraped data and analysis results are generated on-the-fly for each request.
+  - Only the project data in ChromaDB is persistent (used for matching).
+  - If you want to store analysis results, you must add explicit code for persistence.
+
+### 4. Architecture Diagram (Textual)
+
+```
+[User Request]
+     |
+     v
+[FastAPI Endpoint: /api/analyze-client]
+     |
+     v
+[GeminiService.analyze_client]
+     |---> [scrape_website] (requests + BeautifulSoup)
+     |---> [extract_structured_data] (Gemini AI)
+     v
+[ScrapedDataSchema]
+     |
+     v
+[ChromaService.find_similar_projects]
+     |---> [ChromaDB vector search]
+     v
+[List[ProjectMatchSchema]]
+     |
+     v
+[API Response: {scraped_data, matched_projects, ...}]
+```
+
+### 5. Summary Table
+
+| Step                | Data Stored? | Where?                | Persistent? |
+|---------------------|-------------|-----------------------|-------------|
+| Scraping Website    | No          | In-memory (RAM)       | No          |
+| Gemini Extraction   | No          | In-memory (RAM)       | No          |
+| Project Matching    | Yes         | ChromaDB (pre-existing projects) | Yes (projects only) |
+| Analysis Results    | No          | In-memory, API response | No          |
+
+**If you want to persist the analysis results, you would need to add explicit code to save them to a database. Currently, everything except project data in ChromaDB is ephemeral and only exists for the duration of the request.**
+
 ## 🐛 Troubleshooting
 
 ### Database Connection Issues
