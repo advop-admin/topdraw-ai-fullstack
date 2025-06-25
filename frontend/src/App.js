@@ -7,6 +7,7 @@ import SavedProposalsPage from './pages/SavedProposalsPage';
 import ProjectManagementPage from './pages/ProjectManagementPage';
 import SettingsPage from './pages/SettingsPage';
 import ProposalEditor from './components/ProposalEditor';
+import DashboardPage from './pages/DashboardPage';
 import './App.css';
 
 const AppLayout = ({ children, title }) => {
@@ -33,7 +34,15 @@ function App() {
     <Router>
       <div className="app">
         <Routes>
-          <Route path="/" element={<Navigate to="/client-analysis" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <AppLayout title="Dashboard">
+                <DashboardPage />
+              </AppLayout>
+            } 
+          />
           <Route 
             path="/client-analysis" 
             element={

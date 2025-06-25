@@ -109,16 +109,16 @@ export const projectAPI = {
 
 export const systemAPI = {
   // Get system health
-  getHealth: () => api.get('/api/health'),
+  getHealth: () => api.get('/health'),
   
   // Get ChromaDB stats
-  getChromaStats: () => api.get('/api/chroma-stats'),
+  getChromaStats: () => api.get('/chroma-stats'),
   
   // Trigger vectorization migration
-  triggerVectorization: () => api.post('/api/trigger-vectorization'),
+  triggerVectorization: () => api.post('/trigger-vectorization'),
   
   // Get vectorization status
-  getVectorizationStatus: () => api.get('/api/vectorization-status'),
+  getVectorizationStatus: () => api.get('/vectorization-status'),
 };
 
 export const authAPI = {
