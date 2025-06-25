@@ -1,20 +1,29 @@
 version: '3.8'
 
+# Project name will be: qb_takumiai_bdt_fullstack
 services:
-  frontend:
+  bdt-frontend:
     build: ./frontend
+    container_name: qb_takumiai_bdt_fullstack_bdt-frontend_1
+    image: qb_takumiai_bdt_fullstack_bdt-frontend:latest
     ports:
       - "3001:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_API_URL=http://localhost:8000/api
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
-      - backend
+      - bdt-backend
+    networks:
+      - takumi-bdt-network
+    restart: unless-stopped
 
-  backend:
+  bdt-backend:
     build: ./backend
+    container_name: qb_takumiai_bdt_fullstack_bdt-backend_1
+    image: qb_takumiai_bdt_fullstack_bdt-backend:latest
     ports:
       - "8000:8000"
     volumes:
@@ -23,11 +32,21 @@ services:
       - .env
     environment:
       - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
     depends_on:
       - chroma
+    networks:
+      - takumi-bdt-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   chroma:
     image: ghcr.io/chroma-core/chroma:0.5.20
+    container_name: qb_takumiai_bdt_fullstack_chroma_1
     ports:
       - "8001:8000"
     environment:
@@ -36,7 +55,21 @@ services:
       - ANONYMIZED_TELEMETRY=False
     volumes:
       - chroma_data:/chroma/chroma
+    networks:
+      - takumi-bdt-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   chroma_data:
     driver: local
+    name: qb_takumiai_bdt_fullstack_chroma_data
+
+networks:
+  takumi-bdt-network:
+    driver: bridge
+    name: qb_takumiai_bdt_fullstack_takumi-bdt-network

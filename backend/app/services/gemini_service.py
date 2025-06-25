@@ -40,34 +40,33 @@ class GeminiService:
         })
         
     def scrape_website(self, url: str) -> str:
-        """Scrape website content"""
+        """Scrape website content with retry and longer timeout"""
         try:
-            response = self.session.get(
-                url, 
-                timeout=settings.request_timeout,
-                allow_redirects=True
-            )
-            response.raise_for_status()
-            
+            for attempt in range(2):
+                try:
+                    response = self.session.get(
+                        url,
+                        timeout=60.0,  # Increased timeout
+                        allow_redirects=True
+                    )
+                    response.raise_for_status()
+                    break
+                except requests.exceptions.RequestException as e:
+                    if attempt == 0:
+                        time.sleep(2)  # Simple retry
+                    else:
+                        raise e
             soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Remove script and style elements
             for script in soup(["script", "style", "nav", "footer", "aside"]):
                 script.decompose()
-            
-            # Extract main content
             main_content = soup.find('main') or soup.find('body') or soup
             text = main_content.get_text(separator=' ', strip=True)
-            
-            # Clean up text
             text = re.sub(r'\s+', ' ', text)
-            text = text[:8000]  # Limit text length
-            
+            text = text[:8000]
             return text
-            
         except Exception as e:
             logger.error(f"Error scraping {url}: {e}")
-            return ""
+            return "Website took too long to load"
     
     def extract_structured_data(self, website_content: str, social_content: Dict[str, str]) -> ScrapedDataSchema:
         """Extract structured data from scraped content using Gemini"""
