@@ -7,12 +7,6 @@ if ! grep -q "^GEMINI_API_KEY=" .env || grep -q "GEMINI_API_KEY=$" .env; then
   exit 1
 fi
 
-echo "Checking PostgreSQL connection..."
-if ! docker-compose exec backend pg_isready -U $POSTGRES_USER -d $POSTGRES_DB; then
-  echo "PostgreSQL is not ready"
-  exit 1
-fi
-
 echo "Starting Docker containers..."
 docker-compose up -d
 
@@ -20,6 +14,12 @@ echo "Waiting for backend to be healthy..."
 until curl -s http://localhost:8000/api/health | grep -q "healthy"; do
   sleep 2
 done
+
+echo "Checking PostgreSQL connection..."
+if ! docker-compose exec backend python -c "import psycopg2, os; conn = psycopg2.connect(os.environ.get('DATABASE_URL')); conn.close()"; then
+  echo "PostgreSQL is not ready or connection failed."
+  exit 1
+fi
 
 echo "Running vectorization script..."
 docker-compose exec backend python scripts/vectorize_projects.py
