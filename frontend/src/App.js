@@ -31,7 +31,10 @@ const AppLayout = ({ children, title }) => {
 
 function App() {
   return (
-    <Router>
+    <Router future={{
+      v7_startTransition: true,
+      v7_relativeSplatPath: true
+    }}>
       <div className="app">
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

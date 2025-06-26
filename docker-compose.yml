@@ -2,23 +2,25 @@ version: '3.8'
 
 services:
   bdt-frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: qb_takumiai_bdt_fullstack_bdt-frontend_1
     image: qb_takumiai_bdt_fullstack_bdt-frontend:latest
     ports:
       - "3001:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8000/api}
-      - CHOKIDAR_USEPOLLING=true
-      - GENERATE_SOURCEMAP=false
+      - API_BASE_URL=http://localhost:8000/api
     depends_on:
       - bdt-backend
     networks:
       - takumi-bdt-network
-    command: npm start
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3000')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   bdt-backend:
     build: ./backend

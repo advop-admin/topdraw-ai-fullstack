@@ -6,10 +6,11 @@ const Sidebar = () => {
   const location = useLocation();
 
   const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📊', path: '/dashboard' },
     { id: 'client-analysis', label: 'Client Analysis', icon: '🔍', path: '/client-analysis' },
     { id: 'proposal-editor', label: 'Proposal Editor', icon: '✏️', path: '/proposal-editor' },
     { id: 'saved-proposals', label: 'Saved Proposals', icon: '📄', path: '/saved-proposals' },
-    { id: 'project-management', label: 'Project Management', icon: '📊', path: '/project-management' },
+    { id: 'project-management', label: 'Project Management', icon: '📈', path: '/project-management' },
     { id: 'settings', label: 'Settings', icon: '⚙️', path: '/settings' },
   ];
 

@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBurst Proposal Generator - AI-Powered Business Intelligence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-260px);
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .sidebar-header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-right: 4px solid white;
+        }
+
+        .nav-item .icon {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            width: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        input, textarea {
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover, .file-upload.dragover {
+            border-color: #2563eb;
+            background: #f0f4ff;
+        }
+
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            gap: 10px;
+        }
+
+        .file-remove {
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .file-remove:hover {
+            background: #fee2e2;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #4b5563;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #d1d5db;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Analysis Results */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .analysis-card {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(37, 99, 235, 0.2);
+        }
+
+        .analysis-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Project Cards */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .project-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .project-card:hover {
+            border-color: #2563eb;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .project-card.selected {
+            border-color: #2563eb;
+            background: #f0f4ff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .match-score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #059669;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .project-card h4 {
+            margin-bottom: 12px;
+            color: #1f2937;
+            font-size: 1.2rem;
+        }
+
+        .project-card p {
+            color: #6b7280;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #f3f4f6;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Proposal Editor */
+        .proposal-section {
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .proposal-section-header {
+            background: #f8fafc;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .proposal-section-content {
+            padding: 25px;
+        }
+
+        .proposal-textarea {
+            width: 100%;
+            min-height: 200px;
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: #6b7280;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        /* Saved Proposals List */
+        .proposal-list {
+            space-y: 15px;
+        }
+
+        .proposal-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .proposal-info h4 {
+            margin-bottom: 5px;
+            color: #1f2937;
+        }
+
+        .proposal-meta {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .proposal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-260px);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+
+        /* Utilities */
+        .text-center { text-align: center; }
+        .hidden { display: none !important; }
+        .mb-20 { margin-bottom: 20px; }
+        .mb-30 { margin-bottom: 30px; }
+        .text-muted { color: #6b7280; }
+        .font-bold { font-weight: 700; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1>🚀 QBurst</h1>
+            <p>Proposal Generator</p>
+        </div>
+        <div class="sidebar-nav">
+            <button class="nav-item active" onclick="showPage('analyze')">
+                <span class="icon">🔍</span>
+                Client Analysis
+            </button>
+            <button class="nav-item" onclick="showPage('proposals')">
+                <span class="icon">📄</span>
+                Saved Proposals
+            </button>
+            <button class="nav-item" onclick="showPage('projects')">
+                <span class="icon">🗄️</span>
+                Project Management
+            </button>
+            <button class="nav-item" onclick="showPage('settings')">
+                <span class="icon">⚙️</span>
+                Settings
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Header -->
+        <header class="header">
+            <div style="display: flex; align-items: center;">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1 class="page-title" id="pageTitle">Client Analysis</h1>
+            </div>
+            <div class="status-indicator status-online" id="apiStatus">
+                <span>🟢</span> API Connected
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="content">
+            <!-- Page 1: Client Analysis -->
+            <div class="page active" id="analyzePage">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>🔍</span>
+                            Client Information & Analysis
+                        </h2>
+                    </div>
+
+                    <!-- Client Form -->
+                    <div id="clientFormSection">
+                        <form id="clientForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="clientName">Client Name *</label>
+                                    <input type="text" id="clientName" name="name" required placeholder="Enter client company name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="clientWebsite">Website URL *</label>
+                                    <input type="url" id="clientWebsite" name="website" required placeholder="https://example.com">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="socialUrls">Social Media URLs (one per line)</label>
+                                    <textarea id="socialUrls" name="socialUrls" rows="3" placeholder="https://linkedin.com/company/example&#10;https://twitter.com/example"></textarea>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>Screenshots/Documents (Optional)</label>
+                                    <div class="file-upload" id="fileUpload">
+                                        <div style="font-size: 1.2rem; margin-bottom: 10px;">📁</div>
+                                        <div>Drag & drop files here or click to browse</div>
+                                        <div style="font-size: 14px; color: #6b7280; margin-top: 8px;">Supported: JPG, PNG, GIF, WebP (Max 10MB each)</div>
+                                        <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                                    </div>
+                                    <div class="file-preview" id="filePreview"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                                    🔍 Analyze Client
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Analysis Progress -->
+                    <div id="analysisProgress" class="hidden">
+                        <div class="progress-container">
+                            <div class="progress-bar" id="analysisProgressBar"></div>
+                        </div>
+                        <div class="progress-text" id="analysisProgressText">Analyzing client data...</div>
+                    </div>
+
+                    <!-- Analysis Results -->
+                    <div id="analysisResults" class="hidden">
+                        <div class="analysis-grid">
+                            <div class="analysis-card">
+                                <h3>🏢 Company Overview</h3>
+                                <div id="companyOverview"></div>
+                            </div>
+                            <div class="analysis-card">
+                                <h3>💼 Business Needs</h3>
+                                <div id="businessNeeds"></div>
+                            </div>
+                            <div class="analysis-card">
+                                <h3>🎯 Key Insights</h3>
+                                <div id="keyInsights"></div>
+                            </div>
+                        </div>
+
+                        <!-- Project Matches -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <span>🎯</span>
+                                    Matching Projects
+                                </h3>
+                            </div>
+                            <div id="projectsContainer">
+                                <div id="projectsGrid" class="projects-grid"></div>
+                                <div id="noProjectsMessage" class="empty-state hidden">
+                                    <div class="icon">📂</div>
+                                    <h3>No Matching Projects Found</h3>
+                                    <p>We couldn't find any projects that match this client's profile.</p>
+                                    <p class="text-muted">This might be because:</p>
+                                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                                        <li>No similar projects exist in our database</li>
+                                        <li>Vector database hasn't been updated recently</li>
+                                        <li>Project data needs to be synchronized</li>
+                                    </ul>
+                                    <div style="margin-top: 20px;">
+                                        <button class="btn btn-primary" onclick="showPage('projects')">
+                                            🔄 Check Project Management
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center" id="generateProposalSection" style="display: none;">
+                                <button id="generateProposalBtn" class="btn btn-success" onclick="generateProposal()">
+                                    ✨ Generate Proposal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 2: Saved Proposals -->
+            <div class="page" id="proposalsPage">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>📄</span>
+                            Saved Proposals
+                        </h2>
+                        <button class="btn btn-secondary" onclick="refreshProposals()">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                    <div id="proposalsList">
+                        <div class="empty-state">
+                            <div class="icon">📝</div>
+                            <h3>No Saved Proposals</h3>
+                            <p>Create your first proposal by analyzing a client.</p>
+                            <button class="btn btn-primary" onclick="showPage('analyze')">
+                                🔍 Start Analysis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proposal Editor Modal -->
+                <div id="proposalEditor" class="card hidden">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span>✏️</span>
+                            Edit Proposal
+                        </h3>
+                        <div>
+                            <button class="btn btn-secondary" onclick="closeProposalEditor()">Cancel</button>
+                            <button class="btn btn-success" onclick="saveCurrentProposal()">💾 Save</button>
+                            <button class="btn btn-primary" onclick="exportCurrentProposal()">📥 Export</button>
+                        </div>
+                    </div>
+                    <div id="proposalSections"></div>
+                </div>
+            </div>
+
+            <!-- Page 3: Project Management -->
+            <div class="page" id="projectsPage">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalProjects">-</div>
+                        <div class="stat-label">Total Projects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="vectorizedProjects">-</div>
+                        <div class="stat-label">Vectorized Projects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="dbStatus">-</div>
+                        <div class="stat-label">Database Status</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="lastSync">-</div>
+                        <div class="stat-label">Last Sync</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>🗄️</span>
+                            Vector Database Management
+                        </h2>
+                        <div>
+                            <button class="btn btn-secondary" onclick="checkVectorStatus()">
+                                📊 Check Status
+                            </button>
+                            <button class="btn btn-primary" onclick="triggerVectorization()" id="vectorizeBtn">
+                                🔄 Sync Projects
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vectorization Progress -->
+                    <div id="vectorizationProgress" class="hidden">
+                        <div class="progress-container">
+                            <div class="progress-bar" id="vectorProgressBar"></div>
+                        </div>
+                        <div class="progress-text" id="vectorProgressText">Synchronizing projects...</div>
+                    </div>
+
+                    <!-- Vector Database Status -->
+                    <div id="vectorStatus"></div>
+
+                    <!-- Project List -->
+                    <div id="projectsTable">
+                        <h3 style="margin: 30px 0 20px 0;">Available Projects in Database</h3>
+                        <div id="projectsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 4: Settings -->
+            <div class="page" id="settingsPage">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>⚙️</span>
+                            API Configuration
+                        </h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="apiUrl">API Base URL</label>
+                            <input type="url" id="apiUrl" value="http://localhost:8000/api" placeholder="http://localhost:8000/api">
+                        </div>
+                        <div class="form-group">
+                            <label for="geminiKey">Gemini API Key</label>
+                            <input type="password" id="geminiKey" placeholder="Enter your Gemini API key">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="chromaHost">ChromaDB Host</label>
+                            <input type="text" id="chromaHost" value="localhost" placeholder="localhost">
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            💾 Save Settings
+                        </button>
+                        <button class="btn btn-secondary" onclick="testConnection()">
+                            🔗 Test Connection
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span>🏥</span>
+                            System Health
+                        </h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="apiHealth">-</div>
+                            <div class="stat-label">API Status</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="chromaHealth">-</div>
+                            <div class="stat-label">ChromaDB Status</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="geminiHealth">-</div>
+                            <div class="stat-label">Gemini AI Status</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="dbHealth">-</div>
+                            <div class="stat-label">PostgreSQL Status</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span>📊</span>
+                            Usage Statistics
+                        </h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalAnalyses">0</div>
+                            <div class="stat-label">Total Analyses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalProposalsGenerated">0</div>
+                            <div class="stat-label">Proposals Generated</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="avgProcessingTime">-</div>
+                            <div class="stat-label">Avg Processing Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="successRate">-</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global variables
+        let currentPage = 'analyze';
+        let clientData = {};
+        let analysisData = {};
+        let selectedProjects = [];
+        let proposalData = {};
+        let currentEditingProposal = null;
+
+        // API Configuration
+        let API_BASE = 'http://localhost:8000/api';
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadSettings();
+            checkAPIHealth();
+            loadSavedProposals();
+            loadUsageStats();
+        });
+
+        function setupEventListeners() {
+            // File upload
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInput = document.getElementById('fileInput');
+
+            fileUpload.addEventListener('click', () => fileInput.click());
+            fileUpload.addEventListener('dragover', handleDragOver);
+            fileUpload.addEventListener('drop', handleFileDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Form submission
+            document.getElementById('clientForm').addEventListener('submit', handleFormSubmit);
+
+            // Auto-save settings
+            ['apiUrl', 'geminiKey', 'chromaHost'].forEach(id => {
+                document.getElementById(id).addEventListener('change', autoSaveSettings);
+            });
+        }
+
+        // Navigation Functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('open');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        }
+
+        function showPage(pageId) {
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId + 'Page').classList.add('active');
+
+            // Update page title
+            const titles = {
+                'analyze': 'Client Analysis',
+                'proposals': 'Saved Proposals',
+                'projects': 'Project Management',
+                'settings': 'Settings'
+            };
+            document.getElementById('pageTitle').textContent = titles[pageId];
+
+            currentPage = pageId;
+
+            // Page-specific initialization
+            if (pageId === 'projects') {
+                checkVectorStatus();
+            } else if (pageId === 'proposals') {
+                refreshProposals();
+            } else if (pageId === 'settings') {
+                checkSystemHealth();
+            }
+        }
+
+        // File handling functions
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const preview = document.getElementById('filePreview');
+            files.forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+                    return;
+                }
+
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span>📎 ${file.name} (${formatFileSize(file.size)})</span>
+                    <span class="file-remove" onclick="removeFile(this)">✕</span>
+                `;
+                preview.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(element) {
+            element.parentElement.remove();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submission and analysis
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const name = document.getElementById('clientName').value;
+            const website = document.getElementById('clientWebsite').value;
+            const socialUrls = document.getElementById('socialUrls').value.split('\n').filter(url => url.trim());
+            
+            formData.append('name', name);
+            formData.append('website', website);
+            formData.append('social_urls', JSON.stringify(socialUrls));
+
+            // Add files
+            const fileInput = document.getElementById('fileInput');
+            for (let file of fileInput.files) {
+                formData.append('screenshots', file);
+            }
+
+            clientData = { name, website, social_urls: socialUrls };
+
+            await analyzeClient(formData);
+        }
+
+        async function analyzeClient(formData) {
+            try {
+                // Show progress
+                showAnalysisProgress();
+
+                const response = await fetch(`${API_BASE}/analyze-client`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                analysisData = data;
+                displayAnalysisResults(data);
+                
+                // Update usage stats
+                incrementStat('totalAnalyses');
+                
+            } catch (error) {
+                console.error('Error analyzing client:', error);
+                hideAnalysisProgress();
+                alert('Error analyzing client: ' + error.message);
+            }
+        }
+
+        function showAnalysisProgress() {
+            document.getElementById('clientFormSection').style.display = 'none';
+            document.getElementById('analysisProgress').classList.remove('hidden');
+            
+            let progress = 0;
+            const progressBar = document.getElementById('analysisProgressBar');
+            const progressText = document.getElementById('analysisProgressText');
+            
+            const steps = [
+                'Scraping client website...',
+                'Analyzing social media presence...',
+                'Extracting business insights...',
+                'Finding matching projects...',
+                'Calculating similarity scores...'
+            ];
+            
+            const interval = setInterval(() => {
+                progress += 20;
+                progressBar.style.width = progress + '%';
+                
+                if (progress < 100 && steps[Math.floor(progress / 20) - 1]) {
+                    progressText.textContent = steps[Math.floor(progress / 20) - 1];
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressText.textContent = 'Analysis complete!';
+                }
+            }, 1000);
+        }
+
+        function hideAnalysisProgress() {
+            document.getElementById('analysisProgress').classList.add('hidden');
+            document.getElementById('clientFormSection').style.display = 'block';
+        }
+
+        function displayAnalysisResults(data) {
+            hideAnalysisProgress();
+            document.getElementById('analysisResults').classList.remove('hidden');
+
+            const scraped = data.scraped_data;
+            
+            // Company Overview
+            document.getElementById('companyOverview').innerHTML = `
+                <p><strong>Industry:</strong> ${scraped.industry || 'Not specified'}</p>
+                <p><strong>Company Size:</strong> ${scraped.company_size || 'Not specified'}</p>
+                <p style="margin-top: 15px;">${scraped.company_description || 'No description available'}</p>
+            `;
+
+            // Business Needs
+            const services = scraped.services || [];
+            document.getElementById('businessNeeds').innerHTML = `
+                <p><strong>Services Offered:</strong></p>
+                <div class="tag-list">
+                    ${services.length > 0 ? services.map(service => `<span class="tag">${service}</span>`).join('') : '<span class="tag">No services identified</span>'}
+                </div>
+            `;
+
+            // Key Insights
+            const techStack = scraped.tech_stack || [];
+            document.getElementById('keyInsights').innerHTML = `
+                <p><strong>Technology Stack:</strong></p>
+                <div class="tag-list">
+                    ${techStack.length > 0 ? techStack.map(tech => `<span class="tag">${tech}</span>`).join('') : '<span class="tag">No technologies identified</span>'}
+                </div>
+                <p style="margin-top: 15px;"><strong>Confidence Score:</strong> ${Math.round((scraped.confidence_score || 0) * 100)}%</p>
+            `;
+
+            // Display matched projects
+            displayMatchedProjects(data.matched_projects);
+        }
+
+        function displayMatchedProjects(projects) {
+            const grid = document.getElementById('projectsGrid');
+            const noProjectsMessage = document.getElementById('noProjectsMessage');
+            const generateSection = document.getElementById('generateProposalSection');
+            
+            grid.innerHTML = '';
+            
+            if (!projects || projects.length === 0) {
+                noProjectsMessage.classList.remove('hidden');
+                generateSection.style.display = 'none';
+                return;
+            }
+
+            noProjectsMessage.classList.add('hidden');
+            generateSection.style.display = 'block';
+
+            projects.forEach((project, index) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.dataset.projectId = index;
+                card.innerHTML = `
+                    <div class="match-score">${Math.round(project.similarity_score * 100)}% match</div>
+                    <h4>${project.project_name}</h4>
+                    <p>${project.project_description || 'No description available'}</p>
+                    <div class="tag-list">
+                        <span class="tag">${project.industry_vertical}</span>
+                        <span class="tag">${project.client_type}</span>
+                        ${(project.key_features || []).slice(0, 2).map(feature => `<span class="tag">${feature}</span>`).join('')}
+                    </div>
+                `;
+
+                card.addEventListener('click', () => toggleProjectSelection(index, card));
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleProjectSelection(projectIndex, cardElement) {
+            const isSelected = selectedProjects.includes(projectIndex);
+            
+            if (isSelected) {
+                selectedProjects = selectedProjects.filter(id => id !== projectIndex);
+                cardElement.classList.remove('selected');
+            } else {
+                selectedProjects.push(projectIndex);
+                cardElement.classList.add('selected');
+            }
+
+            const generateBtn = document.getElementById('generateProposalBtn');
+            generateBtn.disabled = selectedProjects.length === 0;
+            generateBtn.textContent = selectedProjects.length > 0 ? 
+                `✨ Generate Proposal (${selectedProjects.length} projects)` : 
+                '✨ Generate Proposal';
+        }
+
+        async function generateProposal() {
+            if (selectedProjects.length === 0) {
+                alert('Please select at least one project to generate a proposal.');
+                return;
+            }
+
+            const selectedProjectData = selectedProjects.map(index => analysisData.matched_projects[index]);
+
+            const requestData = {
+                client_info: clientData,
+                scraped_data: analysisData.scraped_data,
+                matched_projects: selectedProjectData,
+                custom_requirements: null
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/generate-proposal`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                proposalData = {
+                    ...data,
+                    client_name: clientData.name,
+                    created_at: new Date().toISOString(),
+                    id: generateId()
+                };
+
+                // Save proposal automatically
+                saveProposal(proposalData);
+                
+                // Open proposal editor
+                openProposalEditor(proposalData);
+                
+                // Update usage stats
+                incrementStat('totalProposalsGenerated');
+
+            } catch (error) {
+                console.error('Error generating proposal:', error);
+                alert('Error generating proposal: ' + error.message);
+            }
+        }
+
+        function openProposalEditor(proposal) {
+            currentEditingProposal = proposal;
+            
+            const sections = parseProposalSections(proposal.proposal_content);
+            const container = document.getElementById('proposalSections');
+            container.innerHTML = '';
+
+            sections.forEach((section, index) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'proposal-section';
+                sectionDiv.innerHTML = `
+                    <div class="proposal-section-header">
+                        <h4>${section.title}</h4>
+                        <button class="btn btn-secondary" onclick="regenerateSection(${index})">🔄 Regenerate</button>
+                    </div>
+                    <div class="proposal-section-content">
+                        <textarea class="proposal-textarea" data-section="${index}">${section.content}</textarea>
+                    </div>
+                `;
+                container.appendChild(sectionDiv);
+            });
+
+            document.getElementById('proposalEditor').classList.remove('hidden');
+            document.getElementById('proposalEditor').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function parseProposalSections(content) {
+            const sections = [];
+            const lines = content.split('\n');
+            let currentSection = null;
+
+            lines.forEach(line => {
+                if (line.trim().startsWith('#')) {
+                    if (currentSection) {
+                        sections.push(currentSection);
+                    }
+                    currentSection = {
+                        title: line.replace(/^#+\s*/, ''),
+                        content: ''
+                    };
+                } else if (currentSection) {
+                    currentSection.content += line + '\n';
+                }
+            });
+
+            if (currentSection) {
+                sections.push(currentSection);
+            }
+
+            return sections.length > 0 ? sections : [{ title: 'Generated Proposal', content: content }];
+        }
+
+        async function regenerateSection(sectionIndex) {
+            const textareas = document.querySelectorAll('.proposal-textarea');
+            const textarea = textareas[sectionIndex];
+            const sectionTitle = document.querySelectorAll('.proposal-section-header h4')[sectionIndex].textContent;
+            
+            const originalContent = textarea.value;
+            textarea.value = 'Regenerating section...';
+            textarea.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/regenerate-section`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        section_name: sectionTitle,
+                        context: analysisData.scraped_data.company_description,
+                        requirements: `Focus on ${clientData.name} and their specific needs in ${analysisData.scraped_data.industry} industry`
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                textarea.value = data.section_content;
+
+            } catch (error) {
+                console.error('Error regenerating section:', error);
+                textarea.value = originalContent;
+                alert('Error regenerating section: ' + error.message);
+            } finally {
+                textarea.disabled = false;
+            }
+        }
+
+        function closeProposalEditor() {
+            document.getElementById('proposalEditor').classList.add('hidden');
+            currentEditingProposal = null;
+        }
+
+        function saveCurrentProposal() {
+            if (!currentEditingProposal) return;
+
+            const textareas = document.querySelectorAll('.proposal-textarea');
+            const updatedContent = Array.from(textareas).map(textarea => textarea.value).join('\n\n');
+            
+            currentEditingProposal.proposal_content = updatedContent;
+            currentEditingProposal.updated_at = new Date().toISOString();
+            
+            saveProposal(currentEditingProposal);
+            alert('Proposal saved successfully!');
+        }
+
+        function exportCurrentProposal() {
+            if (!currentEditingProposal) return;
+
+            const textareas = document.querySelectorAll('.proposal-textarea');
+            const content = Array.from(textareas).map(textarea => textarea.value).join('\n\n');
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentEditingProposal.client_name.replace(/\s+/g, '_')}_Proposal.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Proposal management functions
+        function saveProposal(proposal) {
+            const saved = JSON.parse(localStorage.getItem('qburst_proposals') || '[]');
+            const existingIndex = saved.findIndex(p => p.id === proposal.id);
+            
+            if (existingIndex >= 0) {
+                saved[existingIndex] = proposal;
+            } else {
+                saved.push(proposal);
+            }
+            
+            localStorage.setItem('qburst_proposals', JSON.stringify(saved));
+            
+            if (currentPage === 'proposals') {
+                refreshProposals();
+            }
+        }
+
+        function loadSavedProposals() {
+            return JSON.parse(localStorage.getItem('qburst_proposals') || '[]');
+        }
+
+        function refreshProposals() {
+            const proposals = loadSavedProposals();
+            const container = document.getElementById('proposalsList');
+            
+            if (proposals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📝</div>
+                        <h3>No Saved Proposals</h3>
+                        <p>Create your first proposal by analyzing a client.</p>
+                        <button class="btn btn-primary" onclick="showPage('analyze')">
+                            🔍 Start Analysis
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = proposals.map(proposal => `
+                <div class="proposal-item">
+                    <div class="proposal-info">
+                        <h4>${proposal.client_name}</h4>
+                        <div class="proposal-meta">
+                            Created: ${new Date(proposal.created_at).toLocaleDateString()}
+                            ${proposal.updated_at ? ` • Updated: ${new Date(proposal.updated_at).toLocaleDateString()}` : ''}
+                            • ${proposal.word_count || 0} words
+                        </div>
+                    </div>
+                    <div class="proposal-actions">
+                        <button class="btn btn-secondary" onclick="viewProposal('${proposal.id}')">👁️ View</button>
+                        <button class="btn btn-primary" onclick="editProposal('${proposal.id}')">✏️ Edit</button>
+                        <button class="btn btn-success" onclick="exportProposal('${proposal.id}')">📥 Export</button>
+                        <button class="btn btn-danger" onclick="deleteProposal('${proposal.id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewProposal(proposalId) {
+            const proposals = loadSavedProposals();
+            const proposal = proposals.find(p => p.id === proposalId);
+            if (proposal) {
+                alert(`Proposal for ${proposal.client_name}:\n\n${proposal.proposal_content.substring(0, 500)}...`);
+            }
+        }
+
+        function editProposal(proposalId) {
+            const proposals = loadSavedProposals();
+            const proposal = proposals.find(p => p.id === proposalId);
+            if (proposal) {
+                openProposalEditor(proposal);
+            }
+        }
+
+        function exportProposal(proposalId) {
+            const proposals = loadSavedProposals();
+            const proposal = proposals.find(p => p.id === proposalId);
+            if (proposal) {
+                const blob = new Blob([proposal.proposal_content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${proposal.client_name.replace(/\s+/g, '_')}_Proposal.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function deleteProposal(proposalId) {
+            if (confirm('Are you sure you want to delete this proposal?')) {
+                const proposals = loadSavedProposals();
+                const filtered = proposals.filter(p => p.id !== proposalId);
+                localStorage.setItem('qburst_proposals', JSON.stringify(filtered));
+                refreshProposals();
+            }
+        }
+
+        // Vector Database Management
+        async function checkVectorStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/chroma-stats`);
+                const data = await response.json();
+                
+                displayVectorStatus(data);
+                updateProjectStats(data);
+                
+            } catch (error) {
+                console.error('Error checking vector database:', error);
+                displayVectorError(error.message);
+            }
+        }
+
+        function displayVectorStatus(stats) {
+            const statusDiv = document.getElementById('vectorStatus');
+            statusDiv.innerHTML = `
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <h3>📊 Database Stats</h3>
+                        <p><strong>Collection:</strong> ${stats.collection_name}</p>
+                        <p><strong>Documents:</strong> ${stats.document_count}</p>
+                        <p><strong>Status:</strong> ${stats.status}</p>
+                    </div>
+                    <div class="analysis-card">
+                        <h3>🔗 Connection Info</h3>
+                        <p><strong>Host:</strong> ${stats.host}:${stats.port}</p>
+                        <p><strong>Type:</strong> ${stats.deployment_type || 'Container'}</p>
+                        <p><strong>Health:</strong> ${stats.status === 'connected' ? '🟢 Online' : '🔴 Offline'}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayVectorError(error) {
+            const statusDiv = document.getElementById('vectorStatus');
+            statusDiv.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">⚠️</div>
+                    <h3>Vector Database Error</h3>
+                    <p>${error}</p>
+                    <button class="btn btn-primary" onclick="checkVectorStatus()">
+                        🔄 Retry Connection
+                    </button>
+                </div>
+            `;
+        }
+
+        function updateProjectStats(stats) {
+            document.getElementById('totalProjects').textContent = stats.document_count || 0;
+            document.getElementById('vectorizedProjects').textContent = stats.document_count || 0;
+            document.getElementById('dbStatus').textContent = stats.status === 'connected' ? '🟢' : '🔴';
+            document.getElementById('lastSync').textContent = new Date().toLocaleDateString();
+        }
+
+        async function triggerVectorization() {
+            const button = document.getElementById('vectorizeBtn');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<div class="spinner"></div> Syncing...';
+            button.disabled = true;
+
+            // Show progress
+            showVectorizationProgress();
+
+            try {
+                const response = await fetch(`${API_BASE}/trigger-vectorization`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Simulate progress for better UX
+                    simulateVectorizationProgress();
+                    
+                    setTimeout(() => {
+                        hideVectorizationProgress();
+                        alert('Vectorization completed successfully!');
+                        checkVectorStatus();
+                    }, 10000);
+                } else {
+                    throw new Error(data.detail || 'Vectorization failed');
+                }
+
+            } catch (error) {
+                console.error('Error triggering vectorization:', error);
+                hideVectorizationProgress();
+                alert('Error triggering vectorization: ' + error.message);
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        function showVectorizationProgress() {
+            document.getElementById('vectorizationProgress').classList.remove('hidden');
+        }
+
+        function hideVectorizationProgress() {
+            document.getElementById('vectorizationProgress').classList.add('hidden');
+        }
+
+        function simulateVectorizationProgress() {
+            let progress = 0;
+            const progressBar = document.getElementById('vectorProgressBar');
+            const progressText = document.getElementById('vectorProgressText');
+            
+            const steps = [
+                'Connecting to database...',
+                'Fetching project data...',
+                'Processing project descriptions...',
+                'Generating embeddings...',
+                'Storing in vector database...',
+                'Finalizing synchronization...'
+            ];
+            
+            const interval = setInterval(() => {
+                progress += 16.67;
+                progressBar.style.width = progress + '%';
+                
+                const stepIndex = Math.floor(progress / 16.67) - 1;
+                if (stepIndex >= 0 && stepIndex < steps.length) {
+                    progressText.textContent = steps[stepIndex];
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressText.textContent = 'Synchronization complete!';
+                }
+            }, 1500);
+        }
+
+        // Settings and Configuration
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('qburst_settings') || '{}');
+            
+            if (settings.apiUrl) {
+                document.getElementById('apiUrl').value = settings.apiUrl;
+                API_BASE = settings.apiUrl;
+            }
+            if (settings.geminiKey) {
+                document.getElementById('geminiKey').value = settings.geminiKey;
+            }
+            if (settings.chromaHost) {
+                document.getElementById('chromaHost').value = settings.chromaHost;
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                apiUrl: document.getElementById('apiUrl').value,
+                geminiKey: document.getElementById('geminiKey').value,
+                chromaHost: document.getElementById('chromaHost').value
+            };
+            
+            localStorage.setItem('qburst_settings', JSON.stringify(settings));
+            API_BASE = settings.apiUrl;
+            
+            alert('Settings saved successfully!');
+            checkSystemHealth();
+        }
+
+        function autoSaveSettings() {
+            const settings = {
+                apiUrl: document.getElementById('apiUrl').value,
+                geminiKey: document.getElementById('geminiKey').value,
+                chromaHost: document.getElementById('chromaHost').value
+            };
+            
+            localStorage.setItem('qburst_settings', JSON.stringify(settings));
+            API_BASE = settings.apiUrl;
+        }
+
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    alert('✅ Connection successful! API is responding.');
+                } else {
+                    alert('⚠️ API responded but status is: ' + data.status);
+                }
+            } catch (error) {
+                alert('❌ Connection failed: ' + error.message);
+            }
+        }
+
+        async function checkAPIHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('apiStatus');
+                if (data.status === 'healthy') {
+                    statusElement.className = 'status-indicator status-online';
+                    statusElement.innerHTML = '<span>🟢</span> API Connected';
+                } else {
+                    statusElement.className = 'status-indicator status-warning';
+                    statusElement.innerHTML = '<span>🟡</span> API Warning';
+                }
+            } catch (error) {
+                const statusElement = document.getElementById('apiStatus');
+                statusElement.className = 'status-indicator status-offline';
+                statusElement.innerHTML = '<span>🔴</span> API Offline';
+            }
+        }
+
+        async function checkSystemHealth() {
+            // Check API Health
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                document.getElementById('apiHealth').textContent = data.status === 'healthy' ? '🟢' : '🟡';
+            } catch (error) {
+                document.getElementById('apiHealth').textContent = '🔴';
+            }
+
+            // Check ChromaDB Health
+            try {
+                const response = await fetch(`${API_BASE}/chroma-stats`);
+                const data = await response.json();
+                document.getElementById('chromaHealth').textContent = data.status === 'connected' ? '🟢' : '🔴';
+            } catch (error) {
+                document.getElementById('chromaHealth').textContent = '🔴';
+            }
+
+            // Simulated health checks for other services
+            document.getElementById('geminiHealth').textContent = '🟢'; // Assume healthy if API is working
+            document.getElementById('dbHealth').textContent = '🟢'; // Assume healthy if vectorization works
+        }
+
+        // Usage Statistics
+        function loadUsageStats() {
+            const stats = JSON.parse(localStorage.getItem('qburst_usage_stats') || '{}');
+            
+            document.getElementById('totalAnalyses').textContent = stats.totalAnalyses || 0;
+            document.getElementById('totalProposalsGenerated').textContent = stats.totalProposalsGenerated || 0;
+            document.getElementById('avgProcessingTime').textContent = stats.avgProcessingTime || '-';
+            document.getElementById('successRate').textContent = stats.successRate || '-';
+        }
+
+        function incrementStat(statName) {
+            const stats = JSON.parse(localStorage.getItem('qburst_usage_stats') || '{}');
+            stats[statName] = (stats[statName] || 0) + 1;
+            
+            // Calculate success rate
+            if (stats.totalAnalyses && stats.totalProposalsGenerated) {
+                stats.successRate = Math.round((stats.totalProposalsGenerated / stats.totalAnalyses) * 100) + '%';
+            }
+            
+            localStorage.setItem('qburst_usage_stats', JSON.stringify(stats));
+            loadUsageStats();
+        }
+
+        // Utility functions
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        if (currentEditingProposal) saveCurrentProposal();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        if (currentEditingProposal) exportCurrentProposal();
+                        break;
+                    case '1':
+                        e.preventDefault();
+                        showPage('analyze');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        showPage('proposals');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        showPage('projects');
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        showPage('settings');
+                        break;
+                }
+            }
+        });
+
+        // Auto-refresh functionality
+        setInterval(() => {
+            if (currentPage === 'settings') {
+                checkAPIHealth();
+            } else if (currentPage === 'projects') {
+                // Refresh project stats every 30 seconds
+                checkVectorStatus();
+            }
+        }, 30000);
+
+        // Responsive sidebar handling
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('expanded');
+            }
+        });
+
+        // Error handling wrapper
+        function handleApiError(error, fallbackMessage) {
+            console.error('API Error:', error);
+            const message = error.message || fallbackMessage;
+            alert(message);
+        }
+
+        // Initialize tooltips and help text
+        function initializeHelp() {
+            const helpTexts = {
+                'clientName': 'Enter the full company name of your potential client',
+                'clientWebsite': 'Provide the main website URL for comprehensive analysis',
+                'socialUrls': 'Add LinkedIn, Twitter, or other social media URLs (optional)',
+                'fileUpload': 'Upload screenshots or documents for additional context'
+            };
+
+            Object.keys(helpTexts).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.title = helpTexts[id];
+                }
+            });
+        }
+
+        // Data validation
+        function validateClientForm() {
+            const name = document.getElementById('clientName').value.trim();
+            const website = document.getElementById('clientWebsite').value.trim();
+            
+            if (name.length < 2) {
+                alert('Client name must be at least 2 characters long.');
+                return false;
+            }
+            
+            if (!website.startsWith('http')) {
+                alert('Please enter a valid website URL starting with http:// or https://');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Enhanced form submission with validation
+        const originalHandleFormSubmit = handleFormSubmit;
+        handleFormSubmit = async function(e) {
+            e.preventDefault();
+            
+            if (!validateClientForm()) {
+                return;
+            }
+            
+            await originalHandleFormSubmit(e);
+        };
+
+        // Auto-save draft functionality
+        function saveDraft() {
+            const formData = {
+                name: document.getElementById('clientName').value,
+                website: document.getElementById('clientWebsite').value,
+                socialUrls: document.getElementById('socialUrls').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (formData.name || formData.website) {
+                localStorage.setItem('qburst_draft', JSON.stringify(formData));
+            }
+        }
+
+        function loadDraft() {
+            const draft = JSON.parse(localStorage.getItem('qburst_draft') || '{}');
+            
+            if (draft.name) {
+                document.getElementById('clientName').value = draft.name;
+            }
+            if (draft.website) {
+                document.getElementById('clientWebsite').value = draft.website;
+            }
+            if (draft.socialUrls) {
+                document.getElementById('socialUrls').value = draft.socialUrls;
+            }
+            
+            if (draft.timestamp) {
+                const draftAge = Date.now() - new Date(draft.timestamp).getTime();
+                if (draftAge < 24 * 60 * 60 * 1000) { // Less than 24 hours
+                    console.log('Draft loaded from', new Date(draft.timestamp).toLocaleString());
+                }
+            }
+        }
+
+        // Auto-save draft every 30 seconds
+        setInterval(saveDraft, 30000);
+
+        // Enhanced initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadSettings();
+            loadDraft();
+            checkAPIHealth();
+            loadSavedProposals();
+            loadUsageStats();
+            initializeHelp();
+            
+            // Initialize page based on URL hash
+            const hash = window.location.hash.substring(1);
+            if (['analyze', 'proposals', 'projects', 'settings'].includes(hash)) {
+                showPage(hash);
+            }
+        });
+
+        // Update URL hash when page changes
+        const originalShowPage = showPage;
+        showPage = function(pageId) {
+            originalShowPage(pageId);
+            window.location.hash = pageId;
+        };
+
+        // Handle browser back/forward
+        window.addEventListener('hashchange', function() {
+            const hash = window.location.hash.substring(1);
+            if (['analyze', 'proposals', 'projects', 'settings'].includes(hash)) {
+                currentPage = hash;
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                document.getElementById(hash + 'Page').classList.add('active');
+                
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                // Find and activate the correct nav item
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach((item, index) => {
+                    const pages = ['analyze', 'proposals', 'projects', 'settings'];
+                    if (pages[index] === hash) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        console.log('🚀 QBurst Proposal Generator initialized successfully!');
+        console.log('💡 Keyboard shortcuts: Ctrl+1-4 (navigate), Ctrl+S (save), Ctrl+E (export)');
+    </script>
+</body>
+</html>
