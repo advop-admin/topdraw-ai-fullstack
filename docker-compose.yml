@@ -1,6 +1,5 @@
 version: '3.8'
 
-# Project name will be: qb_takumiai_bdt_fullstack
 services:
   bdt-frontend:
     build: ./frontend
@@ -10,14 +9,16 @@ services:
       - "3001:3000"
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     environment:
-      - REACT_APP_API_URL=http://localhost:8000/api
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8000/api}
       - CHOKIDAR_USEPOLLING=true
+      - GENERATE_SOURCEMAP=false
     depends_on:
       - bdt-backend
     networks:
       - takumi-bdt-network
-    restart: unless-stopped
+    command: npm start
 
   bdt-backend:
     build: ./backend
