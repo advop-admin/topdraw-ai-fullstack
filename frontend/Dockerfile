@@ -1,18 +1,21 @@
-FROM node:18-alpine
+FROM python:3.11-slim
 
+# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy the HTML file
+COPY index.html /app/
 
-# Install dependencies
-RUN npm install
-
-# Copy source code
-COPY . .
-
-# Expose port 3000
+# Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "start"]
+# Create a simple startup script
+RUN echo '#!/bin/bash\ncd /app\npython -m http.server 3000' > /app/start.sh && \
+    chmod +x /app/start.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:3000')" || exit 1
+
+# Start the server
+CMD ["/app/start.sh"]
