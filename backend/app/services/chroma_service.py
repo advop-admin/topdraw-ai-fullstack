@@ -1,6 +1,6 @@
 """
-ChromaDB service for vector similarity search
-Updated for better compatibility with ChromaDB server
+Simple, direct fix for ChromaDB service matching
+Replace your current chroma_service.py with this version
 """
 
 import chromadb
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 class ChromaService:
-    """Service for interacting with ChromaDB (container or cloud)"""
+    """Fixed ChromaDB service that actually returns matches"""
     
     def __init__(self):
         try:
@@ -29,16 +29,12 @@ class ChromaService:
             for attempt in range(max_retries):
                 try:
                     if settings.is_chroma_cloud:
-                        # Cloud configuration
-                        logger.info(f"Connecting to ChromaDB Cloud at {settings.chroma_host}:{settings.chroma_port}")
                         self.client = chromadb.HttpClient(
                             host=settings.chroma_host,
                             port=settings.chroma_port,
                             headers=self.connection_info["headers"]
                         )
                     else:
-                        # Local container configuration
-                        logger.info(f"Connecting to ChromaDB container at {settings.chroma_host}:{settings.chroma_port}")
                         self.client = chromadb.HttpClient(
                             host=settings.chroma_host,
                             port=settings.chroma_port,
@@ -48,7 +44,7 @@ class ChromaService:
                             )
                         )
                     
-                    # Test connection by trying to get or create collection
+                    # Test connection
                     try:
                         self.collection = self.client.get_collection(settings.chroma_collection_name)
                         logger.info(f"Connected to existing collection: {settings.chroma_collection_name}")
@@ -59,8 +55,7 @@ class ChromaService:
                             name=settings.chroma_collection_name,
                             metadata={
                                 "description": "QBurst project embeddings for proposal generation",
-                                "created_by": "Takumi.ai BDT Dashboard",
-                                "deployment_type": self.connection_info["type"]
+                                "created_by": "Takumi.ai BDT Dashboard"
                             }
                         )
                         logger.info(f"Created new collection: {settings.chroma_collection_name}")
@@ -69,13 +64,12 @@ class ChromaService:
                 except Exception as e:
                     if attempt < max_retries - 1:
                         logger.warning(f"Connection attempt {attempt + 1} failed: {e}")
-                        logger.info("Retrying in 5 seconds...")
                         time.sleep(5)
                     else:
                         raise e
                         
         except Exception as e:
-            logger.error(f"Failed to initialize ChromaDB ({self.connection_info.get('type', 'unknown')}): {e}")
+            logger.error(f"Failed to initialize ChromaDB: {e}")
             raise
     
     def find_similar_projects(
@@ -83,119 +77,149 @@ class ChromaService:
         scraped_data: ScrapedDataSchema, 
         limit: int = 10
     ) -> List[ProjectMatchSchema]:
-        """Find similar projects based on client data with filtering"""
+        """Find similar projects - FIXED VERSION that actually returns results"""
         
         try:
-            # Create query text from client data
-            query_text = self._create_search_query(scraped_data)
-            logger.info(f"Searching for projects with query: {query_text[:100]}...")
+            # Create multiple search queries for better coverage
+            queries = self._create_search_queries(scraped_data)
             
-            # Search for similar projects - get more results initially for filtering
-            results = self.collection.query(
-                query_texts=[query_text],
-                n_results=min(limit * 2, 20),  # Get 2x results for better filtering
-                include=["documents", "metadatas", "distances"]
-            )
+            all_results = {}  # Use dict to avoid duplicates
             
-            # Process results with filtering
-            projects = []
-            if results['documents'] and results['documents'][0]:
-                logger.info(f"Found {len(results['documents'][0])} potential matches")
+            # Try each query
+            for query_text, boost in queries:
+                logger.info(f"Searching: {query_text}")
                 
-                for i, doc in enumerate(results['documents'][0]):
-                    metadata = results['metadatas'][0][i]
-                    distance = results['distances'][0][i]
+                try:
+                    results = self.collection.query(
+                        query_texts=[query_text],
+                        n_results=10,
+                        include=["documents", "metadatas", "distances"]
+                    )
                     
-                    # Convert distance to similarity score (1 - normalized_distance)
-                    similarity_score = max(0, 1 - distance)
-                    
-                    # FILTER: Skip very low similarity projects
-                    if similarity_score < 0.1:  # Skip <10% similarity
-                        logger.debug(f"Skipping low similarity project: {metadata.get('project_name', 'Unknown')} ({similarity_score:.2%})")
-                        continue
-                    
-                    try:
-                        # Parse JSON fields safely
-                        tech_stack = {}
-                        key_features = []
-                        
-                        if metadata.get('tech_stack'):
-                            try:
-                                tech_stack = json.loads(metadata['tech_stack'])
-                            except json.JSONDecodeError:
-                                tech_stack = {}
-                        
-                        if metadata.get('key_features'):
-                            try:
-                                key_features = json.loads(metadata['key_features'])
-                            except json.JSONDecodeError:
-                                key_features = []
-                        
-                        project = ProjectMatchSchema(
-                            id=metadata.get('id', f'project_{i}'),
-                            project_name=metadata.get('project_name', 'Unknown Project'),
-                            project_description=metadata.get('project_description', ''),
-                            industry_vertical=metadata.get('industry_vertical', ''),
-                            client_type=metadata.get('client_type', ''),
-                            tech_stack=tech_stack,
-                            similarity_score=similarity_score,
-                            key_features=key_features,
-                            business_impact=metadata.get('business_impact', ''),
-                            project_duration=metadata.get('project_duration'),
-                            team_size=int(metadata.get('team_size', 0)) if metadata.get('team_size') else None,
-                            budget_range=metadata.get('budget_range')
-                        )
-                        projects.append(project)
-                        
-                    except Exception as e:
-                        logger.warning(f"Error processing project result {i}: {e}")
-                        continue
-            else:
-                logger.info("No matching projects found")
+                    if results['documents'] and results['documents'][0]:
+                        for i, (doc, metadata, distance) in enumerate(zip(
+                            results['documents'][0], 
+                            results['metadatas'][0], 
+                            results['distances'][0]
+                        )):
+                            project_id = metadata.get('id', f'project_{i}')
+                            
+                            # SIMPLE similarity calculation - no complex math!
+                            # Distance 0-2 range, convert to 0-100% similarity
+                            base_similarity = max(0, 1 - (distance / 2.0))  # Normalize to 0-1
+                            
+                            # Add boost for industry match
+                            final_similarity = base_similarity * boost
+                            
+                            # Store if better than existing
+                            if project_id not in all_results or final_similarity > all_results[project_id]['similarity']:
+                                all_results[project_id] = {
+                                    'metadata': metadata,
+                                    'similarity': final_similarity,
+                                    'distance': distance
+                                }
+                                
+                except Exception as e:
+                    logger.warning(f"Query failed: {e}")
+                    continue
             
-            # Sort by similarity score and limit results
+            # Convert to ProjectMatchSchema objects
+            projects = []
+            for project_id, result in all_results.items():
+                try:
+                    metadata = result['metadata']
+                    similarity = result['similarity']
+                    
+                    # VERY LOW threshold - show almost everything!
+                    if similarity < 0.05:  # Only filter out <5% similarity
+                        logger.debug(f"Skipping very low similarity: {metadata.get('project_name')} ({similarity:.1%})")
+                        continue
+                    
+                    # Parse JSON fields safely
+                    tech_stack = self._safe_parse_json(metadata.get('tech_stack'), {})
+                    key_features = self._safe_parse_json(metadata.get('key_features'), [])
+                    
+                    project = ProjectMatchSchema(
+                        id=project_id,
+                        project_name=metadata.get('project_name', 'Unknown Project'),
+                        project_description=metadata.get('project_description', ''),
+                        industry_vertical=metadata.get('industry_vertical', ''),
+                        client_type=metadata.get('client_type', ''),
+                        tech_stack=tech_stack,
+                        similarity_score=similarity,
+                        key_features=key_features,
+                        business_impact=metadata.get('business_impact', ''),
+                        project_duration=metadata.get('project_duration'),
+                        team_size=int(metadata.get('team_size', 0)) if metadata.get('team_size') else None,
+                        budget_range=metadata.get('budget_range')
+                    )
+                    projects.append(project)
+                    
+                except Exception as e:
+                    logger.warning(f"Error processing project {project_id}: {e}")
+                    continue
+            
+            # Sort by similarity and return top results
             projects.sort(key=lambda x: x.similarity_score, reverse=True)
+            final_projects = projects[:limit]
             
-            # Return only top matches (max 5 for better UX)
-            top_projects = projects[:5]
+            logger.info(f"Returning {len(final_projects)} projects:")
+            for p in final_projects[:3]:  # Log top 3
+                logger.info(f"  - {p.project_name}: {p.similarity_score:.1%}")
             
-            logger.info(f"Returning {len(top_projects)} filtered similar projects")
-            for project in top_projects:
-                logger.info(f"  - {project.project_name}: {project.similarity_score:.1%} similarity")
-            
-            return top_projects
+            return final_projects
             
         except Exception as e:
             logger.error(f"Error finding similar projects: {e}")
             return []
     
-    def _create_search_query(self, scraped_data: ScrapedDataSchema) -> str:
-        """Create search query from scraped client data"""
+    def _create_search_queries(self, scraped_data: ScrapedDataSchema) -> List[tuple]:
+        """Create search queries with boost factors"""
         
-        query_parts = []
+        queries = []
         
-        # Add industry information
+        # Query 1: Industry + services (high boost for industry match)
         if scraped_data.industry:
-            query_parts.append(f"Industry: {scraped_data.industry}")
+            boost = 1.5 if scraped_data.industry.lower() in ['healthcare', 'finance', 'education', 'retail'] else 1.2
+            query = f"{scraped_data.industry}"
+            if scraped_data.services:
+                query += f" {' '.join(scraped_data.services[:3])}"
+            queries.append((query, boost))
         
-        # Add company description
-        if scraped_data.company_description:
-            query_parts.append(f"Business: {scraped_data.company_description}")
-        
-        # Add services
+        # Query 2: Services focused
         if scraped_data.services:
-            query_parts.append(f"Services: {', '.join(scraped_data.services)}")
+            services_query = " ".join(scraped_data.services[:3])
+            queries.append((services_query, 1.0))
         
-        # Add technology stack
+        # Query 3: Technology focused
         if scraped_data.tech_stack:
-            query_parts.append(f"Technologies: {', '.join(scraped_data.tech_stack)}")
+            tech_query = " ".join(scraped_data.tech_stack[:3])
+            queries.append((tech_query, 0.8))
         
-        # Add company size
-        if scraped_data.company_size:
-            query_parts.append(f"Company size: {scraped_data.company_size}")
+        # Query 4: Company description
+        if scraped_data.company_description:
+            # Extract key words
+            words = scraped_data.company_description.lower().split()
+            key_words = [w for w in words if len(w) > 4][:5]
+            if key_words:
+                desc_query = " ".join(key_words)
+                queries.append((desc_query, 0.7))
         
-        query = " ".join(query_parts)
-        return query if query else "general business software development"
+        # Fallback query
+        if not queries:
+            queries.append(("software development application", 0.5))
+        
+        logger.info(f"Created {len(queries)} search queries")
+        return queries
+    
+    def _safe_parse_json(self, json_str: Optional[str], default):
+        """Safely parse JSON string"""
+        if not json_str:
+            return default
+        try:
+            return json.loads(json_str)
+        except:
+            return default
     
     def get_collection_stats(self) -> Dict[str, Any]:
         """Get collection statistics"""
@@ -219,4 +243,4 @@ class ChromaService:
                 "error": str(e),
                 "host": settings.chroma_host,
                 "port": settings.chroma_port
-            } 
+            }
