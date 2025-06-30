@@ -121,7 +121,7 @@ async def get_vectorization_status():
     """Get vectorization migration status"""
     try:
         # Check if vectorization script is running
-        script_path = os.path.join(os.path.dirname(__file__), "..", "scripts", "vectorize_projects.py")
+        script_path = os.path.join(os.path.dirname(__file__), "..", "..", "scripts", "vectorize_projects.py")
         
         # Simple status check - in production you might want to use a more sophisticated approach
         # like Redis or database to track job status
@@ -140,8 +140,8 @@ async def run_vectorization_migration():
     try:
         logger.info("Starting vectorization migration...")
         
-        # Get the script path
-        script_path = os.path.join(os.path.dirname(__file__), "..", "scripts", "vectorize_projects.py")
+        # Get the script path - fix the path resolution
+        script_path = os.path.join(os.path.dirname(__file__), "..", "..", "scripts", "vectorize_projects.py")
         
         # Run the vectorization script
         result = subprocess.run([

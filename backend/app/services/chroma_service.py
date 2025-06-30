@@ -83,21 +83,21 @@ class ChromaService:
         scraped_data: ScrapedDataSchema, 
         limit: int = 10
     ) -> List[ProjectMatchSchema]:
-        """Find similar projects based on client data"""
+        """Find similar projects based on client data with filtering"""
         
         try:
             # Create query text from client data
             query_text = self._create_search_query(scraped_data)
             logger.info(f"Searching for projects with query: {query_text[:100]}...")
             
-            # Search for similar projects
+            # Search for similar projects - get more results initially for filtering
             results = self.collection.query(
                 query_texts=[query_text],
-                n_results=limit,
+                n_results=min(limit * 2, 20),  # Get 2x results for better filtering
                 include=["documents", "metadatas", "distances"]
             )
             
-            # Process results
+            # Process results with filtering
             projects = []
             if results['documents'] and results['documents'][0]:
                 logger.info(f"Found {len(results['documents'][0])} potential matches")
@@ -108,6 +108,11 @@ class ChromaService:
                     
                     # Convert distance to similarity score (1 - normalized_distance)
                     similarity_score = max(0, 1 - distance)
+                    
+                    # FILTER: Skip very low similarity projects
+                    if similarity_score < 0.1:  # Skip <10% similarity
+                        logger.debug(f"Skipping low similarity project: {metadata.get('project_name', 'Unknown')} ({similarity_score:.2%})")
+                        continue
                     
                     try:
                         # Parse JSON fields safely
@@ -148,11 +153,17 @@ class ChromaService:
             else:
                 logger.info("No matching projects found")
             
-            # Sort by similarity score
+            # Sort by similarity score and limit results
             projects.sort(key=lambda x: x.similarity_score, reverse=True)
             
-            logger.info(f"Returning {len(projects)} similar projects")
-            return projects
+            # Return only top matches (max 5 for better UX)
+            top_projects = projects[:5]
+            
+            logger.info(f"Returning {len(top_projects)} filtered similar projects")
+            for project in top_projects:
+                logger.info(f"  - {project.project_name}: {project.similarity_score:.1%} similarity")
+            
+            return top_projects
             
         except Exception as e:
             logger.error(f"Error finding similar projects: {e}")

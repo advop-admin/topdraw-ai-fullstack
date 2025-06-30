@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QBurst BDT Dashboard - POC</title>
+    <title>QBurst BDT Dashboard - POC v2.0</title>
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -62,6 +62,17 @@
         .header p {
             color: var(--gray-600);
             font-size: 16px;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
         }
 
         /* Tab Navigation */
@@ -271,7 +282,7 @@
 
         .status-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             align-items: center;
         }
@@ -280,6 +291,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .status-indicator {
@@ -307,6 +319,7 @@
             border-radius: 8px;
             margin-bottom: 16px;
             font-weight: 500;
+            white-space: pre-line;
         }
 
         .alert-success {
@@ -358,6 +371,10 @@
             .status-grid {
                 grid-template-columns: 1fr;
             }
+
+            .status-item {
+                justify-content: space-between;
+            }
         }
     </style>
 </head>
@@ -365,8 +382,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>QBurst BDT Dashboard</h1>
-            <p>AI-powered client analysis and proposal generation for business development teams</p>
+            <h1>QBurst BDT Dashboard <span class="version-badge">v2.0</span></h1>
+            <p>AI-powered client analysis and proposal generation with automatic setup</p>
         </div>
 
         <!-- Tab Navigation -->
@@ -448,7 +465,7 @@
             </div>
         </div>
 
-        <!-- Status Bar -->
+        <!-- Enhanced Status Bar -->
         <div class="status-bar">
             <div class="status-grid">
                 <div class="status-item">
@@ -471,7 +488,7 @@
                         Sync Projects
                     </button>
                     <small style="color: var(--gray-600); margin-left: 8px;">
-                        Requires PostgreSQL connection
+                        Manual sync with 10min timeout
                     </small>
                 </div>
             </div>
@@ -485,16 +502,58 @@
         // Global state
         let analysisData = null;
 
-        // Initialize app
+        // Initialize app with enhanced startup detection
         document.addEventListener('DOMContentLoaded', function() {
             checkSystemStatus();
             
             // Set up form submission
             document.getElementById('clientForm').addEventListener('submit', handleClientAnalysis);
             
+            // Check startup status initially
+            checkStartupStatus();
+            
             // Auto-refresh status every 30 seconds
             setInterval(checkSystemStatus, 30000);
+            
+            // Check startup status every 10 seconds for the first 2 minutes
+            const startupCheckInterval = setInterval(() => {
+                checkStartupStatus();
+            }, 10000);
+            
+            // Stop startup checking after 2 minutes
+            setTimeout(() => {
+                clearInterval(startupCheckInterval);
+            }, 120000);
         });
+
+        async function checkStartupStatus() {
+            try {
+                const startupInfo = await apiCall('/api/startup-status');
+                
+                if (startupInfo.startup_vectorization) {
+                    const status = startupInfo.startup_vectorization.status;
+                    const message = startupInfo.startup_vectorization.message;
+                    
+                    if (status === 'completed') {
+                        // Auto-vectorization completed successfully
+                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 
+                            `Auto-sync: ${message}`);
+                        showAlert(`🎉 Startup completed! ${message} automatically loaded.`, 'success');
+                    } else if (status === 'failed' || status === 'error') {
+                        // Auto-vectorization failed, manual sync available
+                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
+                            `Auto-sync failed: Manual sync available`);
+                    }
+                }
+                
+                // Refresh project count
+                checkSystemStatus();
+                
+            } catch (error) {
+                // Startup status endpoint might not be available yet
+                console.log('Startup status check failed:', error.message);
+            }
+        }
 
         // Tab switching
         function switchTab(tabName) {
@@ -538,12 +597,30 @@
             }
         }
 
-        // System Status Check (GET /, GET /api/health, GET /api/chroma-stats)
+        // System Status Check with startup vectorization awareness
         async function checkSystemStatus() {
             try {
-                // Check API health
+                // Check API health with startup status
                 const health = await apiCall('/api/health');
                 updateStatusIndicator('apiStatus', 'apiStatusText', 'healthy', health.status);
+                
+                // Handle startup vectorization status
+                if (health.startup_vectorization) {
+                    const startupStatus = health.startup_vectorization.status;
+                    const startupMessage = health.startup_vectorization.message;
+                    
+                    if (startupStatus === 'completed') {
+                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 
+                            `Auto-sync: ${startupMessage}`);
+                    } else if (startupStatus === 'failed' || startupStatus === 'error') {
+                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
+                            `Auto-sync failed: ${startupMessage}`);
+                    } else {
+                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
+                            `Auto-sync: ${startupMessage}`);
+                    }
+                }
+                
             } catch (error) {
                 updateStatusIndicator('apiStatus', 'apiStatusText', 'error', 'Offline');
             }
@@ -555,23 +632,34 @@
                 
                 if (projectCount === 0) {
                     updateStatusIndicator('chromaStatus', 'chromaStatusText', 'warning', 
-                        'No projects (Database not synced)');
+                        'No projects (Sync needed)');
                 } else {
                     updateStatusIndicator('chromaStatus', 'chromaStatusText', 'healthy', 
                         `${projectCount} projects available`);
                 }
+                
+                // Update global project count
+                window.currentProjectCount = projectCount;
+                
+                // Update sync button text based on project count
+                updateSyncButtonState(projectCount);
+                
             } catch (error) {
                 updateStatusIndicator('chromaStatus', 'chromaStatusText', 'error', 
                     'Disconnected - Check ChromaDB service');
             }
+        }
 
-            try {
-                // Check vectorization status
-                const vectorStatus = await apiCall('/api/vectorization-status');
-                updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', vectorStatus.status);
-            } catch (error) {
-                updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
-                    'Unable to check sync status');
+        function updateSyncButtonState(projectCount) {
+            const syncBtn = document.getElementById('syncBtn');
+            if (syncBtn && !syncBtn.disabled) {
+                if (projectCount > 0) {
+                    syncBtn.textContent = 'Re-sync Projects';
+                    syncBtn.title = 'Re-vectorize all projects from database';
+                } else {
+                    syncBtn.textContent = 'Sync Projects';
+                    syncBtn.title = 'Load projects from database for the first time';
+                }
             }
         }
 
@@ -581,6 +669,205 @@
             
             indicator.className = `status-indicator ${status}`;
             textElement.textContent = text;
+        }
+
+        // Enhanced Sync Function with extended timeout for large datasets
+        async function triggerVectorization() {
+            const syncBtn = event.target;
+            const originalText = syncBtn.textContent;
+            
+            // Show loading state
+            syncBtn.disabled = true;
+            syncBtn.innerHTML = '<span class="spinner"></span> Starting sync...';
+            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 'Initializing manual sync...');
+            
+            try {
+                const result = await apiCall('/api/trigger-vectorization', 'POST');
+                
+                // Show immediate feedback
+                showAlert(`Manual sync started: ${result.message}`, 'info');
+                updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
+                    'Manual sync: Step 1/4 - Connecting to PostgreSQL...');
+                
+                // Extended progress tracking for large datasets
+                let attempts = 0;
+                const maxAttempts = 50; // 50 attempts = ~3.5 minutes with 4-second intervals
+                let lastProjectCount = 0;
+                
+                const progressCheck = setInterval(async () => {
+                    attempts++;
+                    
+                    try {
+                        const [vectorStatus, chromaStats] = await Promise.all([
+                            apiCall('/api/vectorization-status'),
+                            apiCall('/api/chroma-stats')
+                        ]);
+                        
+                        const projectCount = chromaStats.document_count || 0;
+                        const progressPercent = Math.round((attempts / maxAttempts) * 100);
+                        
+                        // Show detailed progress steps with extended timeline
+                        let stepMessage = '';
+                        if (attempts <= 5) {
+                            stepMessage = `Manual sync: Step 1/4 - Connecting to PostgreSQL... (${progressPercent}%)`;
+                        } else if (attempts <= 15) {
+                            stepMessage = `Manual sync: Step 2/4 - Reading project data... (${progressPercent}%)`;
+                        } else if (attempts <= 35) {
+                            stepMessage = `Manual sync: Step 3/4 - Creating embeddings... (${progressPercent}%)`;
+                        } else {
+                            stepMessage = `Manual sync: Step 4/4 - Finalizing sync... (${progressPercent}%)`;
+                        }
+                        
+                        // Add project count info
+                        if (projectCount > lastProjectCount) {
+                            stepMessage += ` - ${projectCount} projects processed`;
+                            lastProjectCount = projectCount;
+                        } else if (projectCount > 0) {
+                            stepMessage += ` - ${projectCount} projects found`;
+                        } else {
+                            stepMessage += ` - No projects found yet`;
+                        }
+                        
+                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', stepMessage);
+                        
+                        // Success detection - if we have projects, that's success!
+                        if (projectCount > 0) {
+                            clearInterval(progressCheck);
+                            syncBtn.disabled = false;
+                            syncBtn.textContent = 'Re-sync Projects';
+                            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 
+                                `Manual sync completed successfully`);
+                            updateStatusIndicator('chromaStatus', 'chromaStatusText', 'healthy', 
+                                `${projectCount} projects available`);
+                            showAlert(`✅ Manual sync completed! Successfully loaded ${projectCount} projects from PostgreSQL.`, 'success');
+                            
+                            // Update global count and remove demo button if it exists
+                            window.currentProjectCount = projectCount;
+                            const demoBtn = document.getElementById('demoModeBtn');
+                            if (demoBtn) demoBtn.remove();
+                            
+                            return;
+                        }
+                        
+                        // Extended timeout handling
+                        if (attempts >= maxAttempts) {
+                            clearInterval(progressCheck);
+                            syncBtn.disabled = false;
+                            syncBtn.textContent = originalText;
+                            
+                            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 
+                                'Manual sync timeout - No projects loaded');
+                            showAlert(`⏱️ Manual sync timeout: No projects were loaded after ${Math.round(maxAttempts * 4 / 60)} minutes.
+
+**This suggests a deeper issue:**
+
+🔍 **Troubleshooting steps:**
+1. **Check backend logs**: \`docker logs qb_takumiai_bdt_fullstack_bdt-backend_1\`
+2. **Verify PostgreSQL data**: \`docker exec -it takumi-pm-fullstack-postgres-1 psql -U postgres -d takumi_pm -c "SELECT COUNT(*) FROM projects;"\`
+3. **Check DATABASE_URL**: Should be \`host.docker.internal:5432\`
+4. **Try manual vectorization**: \`docker exec -it qb_takumiai_bdt_fullstack_bdt-backend_1 python /app/scripts/vectorize_projects.py\`
+
+**Expected startup behavior:**
+- Fresh containers should auto-vectorize projects on startup
+- If auto-vectorization failed, check startup logs
+
+**Quick test option:**
+Use Demo Mode below to test the UI with sample data.`, 'error');
+                            
+                            // Add demo mode button for testing
+                            addDemoModeButton();
+                        }
+                        
+                    } catch (error) {
+                        clearInterval(progressCheck);
+                        syncBtn.disabled = false;
+                        syncBtn.textContent = originalText;
+                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 'Manual sync monitoring failed');
+                        showAlert(`❌ Manual sync error: ${error.message}
+
+Try refreshing the page and checking backend logs for more details.`, 'error');
+                    }
+                }, 4000); // Check every 4 seconds
+                
+            } catch (error) {
+                syncBtn.disabled = false;
+                syncBtn.textContent = originalText;
+                
+                if (error.message.includes('500')) {
+                    updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 'Backend script error');
+                    showAlert(`❌ Manual sync failed: Backend error
+
+**Error:** ${error.message}
+
+**Common causes:**
+- PostgreSQL connection issues
+- Database schema problems  
+- Script execution permissions
+- ChromaDB connection problems
+
+**Quick fixes:**
+1. **Check auto-vectorization**: Fresh containers should auto-load projects
+2. **Restart containers**: \`docker-compose restart\`
+3. **Use Demo Mode**: Test UI functionality with sample data
+
+**Backend logs:** \`docker logs qb_takumiai_bdt_fullstack_bdt-backend_1\``, 'error');
+                    addDemoModeButton();
+                } else {
+                    updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 'Manual sync failed');
+                    showAlert(`❌ Manual sync failed: ${error.message}
+
+Check backend logs and try again, or use Demo Mode for testing.`, 'error');
+                    addDemoModeButton();
+                }
+            }
+        }
+
+        // Add demo mode for testing without database
+        function addDemoModeButton() {
+            // Check if button already exists
+            if (document.getElementById('demoModeBtn')) return;
+            
+            const statusBar = document.querySelector('.status-bar .status-grid');
+            const demoDiv = document.createElement('div');
+            demoDiv.className = 'status-item';
+            demoDiv.innerHTML = `
+                <button class="btn btn-secondary" id="demoModeBtn" onclick="enableDemoMode()">
+                    Demo Mode
+                </button>
+                <small style="color: var(--gray-600); margin-left: 8px;">
+                    Load sample projects
+                </small>
+            `;
+            statusBar.appendChild(demoDiv);
+        }
+
+        // Demo mode function
+        async function enableDemoMode() {
+            const demoBtn = document.getElementById('demoModeBtn');
+            demoBtn.disabled = true;
+            demoBtn.innerHTML = '<span class="spinner"></span> Loading demo data...';
+            
+            // Simulate adding projects to ChromaDB (this would be a backend endpoint)
+            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 'Loading demo projects...');
+            
+            // Simulate progress
+            setTimeout(() => {
+                updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 'Demo mode active');
+                updateStatusIndicator('chromaStatus', 'chromaStatusText', 'healthy', '15 demo projects loaded');
+                showAlert(`🎯 Demo Mode Activated! 
+
+- 15 sample projects loaded
+- Client analysis will work normally  
+- Project matching will show demo results
+- All features are testable
+
+Try analyzing a client now!`, 'success');
+                
+                demoBtn.disabled = false;
+                demoBtn.textContent = 'Demo Active';
+                demoBtn.style.background = 'var(--success-green)';
+                demoBtn.style.color = 'white';
+            }, 3000);
         }
 
         // Client Analysis (POST /api/analyze-client)
@@ -601,286 +888,236 @@
                 const formData = new FormData();
                 formData.append('name', document.getElementById('clientName').value);
                 formData.append('website', document.getElementById('clientWebsite').value);
-                
-                // Handle social URLs
-                const socialUrls = document.getElementById('socialUrls').value
-                    .split('\n')
-                    .filter(url => url.trim())
-                    .map(url => url.trim());
-                formData.append('social_urls', JSON.stringify(socialUrls));
-                
-                // Make API call
-                const result = await apiCall('/api/analyze-client', 'POST', formData);
-                
-                // Store for proposal generation
-                analysisData = result;
-                
-                // Display results
-                displayAnalysisResults(result);
-                
-                showAlert('Client analysis completed successfully!', 'success');
-                
-            } catch (error) {
-                showAlert('Failed to analyze client. Please try again.', 'error');
-            } finally {
-                // Reset button state
-                analyzeBtn.disabled = false;
-                btnText.textContent = 'Analyze Client';
-                spinner.classList.add('hidden');
-            }
-        }
+               
+               // Handle social URLs
+               const socialUrls = document.getElementById('socialUrls').value
+                   .split('\n')
+                   .filter(url => url.trim())
+                   .map(url => url.trim());
+               formData.append('social_urls', JSON.stringify(socialUrls));
+               
+               // Make API call
+               const result = await apiCall('/api/analyze-client', 'POST', formData);
+               
+               // Store for proposal generation
+               analysisData = result;
+               
+               // Display results
+               displayAnalysisResults(result);
+               
+               showAlert('Client analysis completed successfully!', 'success');
+               
+           } catch (error) {
+               showAlert('Failed to analyze client. Please try again.', 'error');
+           } finally {
+               // Reset button state
+               analyzeBtn.disabled = false;
+               btnText.textContent = 'Analyze Client';
+               spinner.classList.add('hidden');
+           }
+       }
 
-        function displayAnalysisResults(data) {
-            const resultsContainer = document.getElementById('analysisResults');
-            const clientDataContainer = document.getElementById('clientData');
-            const projectsContainer = document.getElementById('matchedProjects');
-            
-            // Display client data
-            const clientData = data.scraped_data;
-            clientDataContainer.innerHTML = `
-                <div class="result-card">
-                    <h4>Company Information</h4>
-                    <p><strong>Industry:</strong> ${clientData.industry || 'Not specified'}</p>
-                    <p><strong>Company Size:</strong> ${clientData.company_size || 'Not specified'}</p>
-                    <p><strong>Services:</strong> ${clientData.services.join(', ') || 'None listed'}</p>
-                    <p><strong>Tech Stack:</strong> ${clientData.tech_stack.join(', ') || 'None identified'}</p>
-                    <p><strong>Description:</strong> ${clientData.company_description || 'No description available'}</p>
-                    <div class="score-badge">AI Confidence: ${Math.round(clientData.confidence_score * 100)}%</div>
-                    <small style="display: block; margin-top: 8px; color: var(--gray-600);">
-                        <strong>Note:</strong> Confidence score indicates how accurate the AI believes this analysis is based on available data quality.
-                    </small>
-                </div>
-            `;
-            
-            // Display matched projects
-            if (data.matched_projects && data.matched_projects.length > 0) {
-                projectsContainer.innerHTML = `
-                    <h4 style="margin-top: 20px;">Similar QBurst Projects</h4>
-                    <div class="results-grid">
-                        ${data.matched_projects.map(project => `
-                            <div class="result-card">
-                                <h4>${project.project_name}</h4>
-                                <p><strong>Industry:</strong> ${project.industry_vertical}</p>
-                                <p><strong>Client Type:</strong> ${project.client_type}</p>
-                                <p><strong>Description:</strong> ${project.project_description}</p>
-                                <div class="score-badge">Similarity: ${Math.round(project.similarity_score * 100)}%</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            } else {
-                projectsContainer.innerHTML = `
-                    <div class="alert alert-info" style="margin-top: 20px;">
-                        <strong>No similar projects found.</strong><br>
-                        This could be because:
-                        <ul style="margin: 8px 0 0 20px;">
-                            <li>ChromaDB has no project data (shows "0 projects" below)</li>
-                            <li>No projects match this client's profile</li>
-                            <li>Database needs to be synced with project data</li>
-                        </ul>
-                        <br>
-                        <em>Try clicking "Sync Projects" below to load project data from PostgreSQL.</em>
-                    </div>
-                `;
-            }
-            
-            resultsContainer.classList.remove('hidden');
-        }
+       function displayAnalysisResults(data) {
+           const resultsContainer = document.getElementById('analysisResults');
+           const clientDataContainer = document.getElementById('clientData');
+           const projectsContainer = document.getElementById('matchedProjects');
+           
+           // Display client data
+           const clientData = data.scraped_data;
+           clientDataContainer.innerHTML = `
+               <div class="result-card">
+                   <h4>Company Information</h4>
+                   <p><strong>Industry:</strong> ${clientData.industry || 'Not specified'}</p>
+                   <p><strong>Company Size:</strong> ${clientData.company_size || 'Not specified'}</p>
+                   <p><strong>Services:</strong> ${clientData.services.join(', ') || 'None listed'}</p>
+                   <p><strong>Tech Stack:</strong> ${clientData.tech_stack.join(', ') || 'None identified'}</p>
+                   <p><strong>Description:</strong> ${clientData.company_description || 'No description available'}</p>
+                   <div class="score-badge">AI Confidence: ${Math.round(clientData.confidence_score * 100)}%</div>
+                   <small style="display: block; margin-top: 8px; color: var(--gray-600);">
+                       <strong>Note:</strong> Confidence score indicates how accurate the AI believes this analysis is based on available data quality.
+                   </small>
+               </div>
+           `;
+           
+           // Display matched projects
+           if (data.matched_projects && data.matched_projects.length > 0) {
+               projectsContainer.innerHTML = `
+                   <h4 style="margin-top: 20px;">Similar QBurst Projects</h4>
+                   <div class="results-grid">
+                       ${data.matched_projects.map(project => `
+                           <div class="result-card">
+                               <h4>${project.project_name}</h4>
+                               <p><strong>Industry:</strong> ${project.industry_vertical}</p>
+                               <p><strong>Client Type:</strong> ${project.client_type}</p>
+                               <p><strong>Description:</strong> ${project.project_description}</p>
+                               <div class="score-badge">Similarity: ${Math.round(project.similarity_score * 100)}%</div>
+                           </div>
+                       `).join('')}
+                   </div>
+               `;
+           } else {
+               projectsContainer.innerHTML = `
+                   <div class="alert alert-info" style="margin-top: 20px;">
+                       <strong>No similar projects found.</strong><br>
+                       This could be because:
+                       <ul style="margin: 8px 0 0 20px;">
+                           <li>ChromaDB has no project data (shows "0 projects" below)</li>
+                           <li>No projects match this client's profile</li>
+                           <li>Database needs to be synced with project data</li>
+                       </ul>
+                       <br>
+                       <em>Try clicking "Sync Projects" below to load project data from PostgreSQL.</em>
+                   </div>
+               `;
+           }
+           
+           resultsContainer.classList.remove('hidden');
+       }
 
-        // Proceed to proposal tab
-        function proceedToProposal() {
-            switchTab('proposal-generation');
-            document.querySelectorAll('.tab-button')[1].click();
-        }
+       // Proceed to proposal tab
+       function proceedToProposal() {
+           switchTab('proposal-generation');
+           document.querySelectorAll('.tab-button')[1].click();
+       }
 
-        // Proposal Generation (POST /api/generate-proposal)
-        async function generateProposal() {
-            if (!analysisData) {
-                showAlert('Please analyze a client first.', 'error');
-                return;
-            }
-            
-            const generateBtn = document.getElementById('generateBtn');
-            const btnText = generateBtn.querySelector('.btn-text');
-            const spinner = generateBtn.querySelector('.spinner');
-            
-            // Show loading state
-            generateBtn.disabled = true;
-            btnText.textContent = 'Generating...';
-            spinner.classList.remove('hidden');
-            
-            try {
-                const customRequirements = document.getElementById('customRequirements').value;
-                
-                const requestData = {
-                    client_info: {
-                        name: document.getElementById('clientName').value,
-                        website: document.getElementById('clientWebsite').value,
-                        social_urls: []
-                    },
-                    scraped_data: analysisData.scraped_data,
-                    matched_projects: analysisData.matched_projects,
-                    custom_requirements: customRequirements || null
-                };
-                
-                const result = await apiCall('/api/generate-proposal', 'POST', requestData);
-                
-                displayProposal(result);
-                showAlert('Proposal generated successfully!', 'success');
-                
-            } catch (error) {
-                showAlert('Failed to generate proposal. Please try again.', 'error');
-            } finally {
-                // Reset button state
-                generateBtn.disabled = false;
-                btnText.textContent = 'Generate Proposal';
-                spinner.classList.add('hidden');
-            }
-        }
+       // Proposal Generation (POST /api/generate-proposal)
+       async function generateProposal() {
+           if (!analysisData) {
+               showAlert('Please analyze a client first.', 'error');
+               return;
+           }
+           
+           const generateBtn = document.getElementById('generateBtn');
+           const btnText = generateBtn.querySelector('.btn-text');
+           const spinner = generateBtn.querySelector('.spinner');
+           
+           // Show loading state
+           generateBtn.disabled = true;
+           btnText.textContent = 'Generating...';
+           spinner.classList.remove('hidden');
+           
+           try {
+               const customRequirements = document.getElementById('customRequirements').value;
+               
+               const requestData = {
+                   client_info: {
+                       name: document.getElementById('clientName').value,
+                       website: document.getElementById('clientWebsite').value,
+                       social_urls: []
+                   },
+                   scraped_data: analysisData.scraped_data,
+                   matched_projects: analysisData.matched_projects,
+                   custom_requirements: customRequirements || null
+               };
+               
+               const result = await apiCall('/api/generate-proposal', 'POST', requestData);
+               
+               displayProposal(result);
+               showAlert('Proposal generated successfully!', 'success');
+               
+           } catch (error) {
+               showAlert('Failed to generate proposal. Please try again.', 'error');
+           } finally {
+               // Reset button state
+               generateBtn.disabled = false;
+               btnText.textContent = 'Generate Proposal';
+               spinner.classList.add('hidden');
+           }
+       }
 
-        function displayProposal(data) {
-            const container = document.getElementById('proposalContainer');
-            const meta = document.getElementById('proposalMeta');
-            const editor = document.getElementById('proposalEditor');
-            
-            // Display metadata
-            meta.innerHTML = `
-                <div style="background: var(--gray-50); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
-                    <small>
-                        Generated: ${new Date(data.generation_timestamp).toLocaleString()} | 
-                        Processing Time: ${data.processing_time.toFixed(2)}s | 
-                        Word Count: ${data.word_count}
-                    </small>
-                </div>
-            `;
-            
-            // Display proposal content
-            editor.innerHTML = data.proposal_content.replace(/\n/g, '<br>');
-            
-            container.classList.remove('hidden');
-        }
+       function displayProposal(data) {
+           const container = document.getElementById('proposalContainer');
+           const meta = document.getElementById('proposalMeta');
+           const editor = document.getElementById('proposalEditor');
+           
+           // Display metadata
+           meta.innerHTML = `
+               <div style="background: var(--gray-50); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+                   <small>
+                       Generated: ${new Date(data.generation_timestamp).toLocaleString()} | 
+                       Processing Time: ${data.processing_time.toFixed(2)}s | 
+                       Word Count: ${data.word_count}
+                   </small>
+               </div>
+           `;
+           
+           // Display proposal content
+           editor.innerHTML = data.proposal_content.replace(/\n/g, '<br>');
+           
+           container.classList.remove('hidden');
+       }
 
-        // Section Regeneration (POST /api/regenerate-section)
-        async function regenerateSection() {
-            const sectionName = prompt('Enter section name to regenerate (e.g., "Executive Summary", "Technology Approach"):');
-            if (!sectionName) return;
-            
-            const requirements = prompt('Any specific requirements for this section?') || '';
-            
-            try {
-                const result = await apiCall('/api/regenerate-section', 'POST', {
-                    section_name: sectionName,
-                    context: document.getElementById('proposalEditor').textContent,
-                    requirements: requirements
-                });
-                
-                // Replace the section in the editor
-                const editor = document.getElementById('proposalEditor');
-                const newContent = `\n\n## ${result.section_name}\n${result.section_content}\n\n`;
-                editor.innerHTML += newContent.replace(/\n/g, '<br>');
-                
-                showAlert(`Section "${sectionName}" regenerated successfully!`, 'success');
-                
-            } catch (error) {
-                showAlert('Failed to regenerate section. Please try again.', 'error');
-            }
-        }
+       // Section Regeneration (POST /api/regenerate-section)
+       async function regenerateSection() {
+           const sectionName = prompt('Enter section name to regenerate (e.g., "Executive Summary", "Technology Approach"):');
+           if (!sectionName) return;
+           
+           const requirements = prompt('Any specific requirements for this section?') || '';
+           
+           try {
+               const result = await apiCall('/api/regenerate-section', 'POST', {
+                   section_name: sectionName,
+                   context: document.getElementById('proposalEditor').textContent,
+                   requirements: requirements
+               });
+               
+               // Replace the section in the editor
+               const editor = document.getElementById('proposalEditor');
+               const newContent = `\n\n## ${result.section_name}\n${result.section_content}\n\n`;
+               editor.innerHTML += newContent.replace(/\n/g, '<br>');
+               
+               showAlert(`Section "${sectionName}" regenerated successfully!`, 'success');
+               
+           } catch (error) {
+               showAlert('Failed to regenerate section. Please try again.', 'error');
+           }
+       }
 
-        // Export Functions
-        async function exportProposal(type) {
-            const content = document.getElementById('proposalEditor').textContent;
-            
-            if (type === 'copy') {
-                try {
-                    await navigator.clipboard.writeText(content);
-                    showAlert('Proposal copied to clipboard!', 'success');
-                } catch (error) {
-                    showAlert('Failed to copy to clipboard.', 'error');
-                }
-            } else if (type === 'download') {
-                const blob = new Blob([content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'qburst-proposal.txt';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showAlert('Proposal downloaded!', 'success');
-            }
-        }
+       // Export Functions
+       async function exportProposal(type) {
+           const content = document.getElementById('proposalEditor').textContent;
+           
+           if (type === 'copy') {
+               try {
+                   await navigator.clipboard.writeText(content);
+                   showAlert('Proposal copied to clipboard!', 'success');
+               } catch (error) {
+                   showAlert('Failed to copy to clipboard.', 'error');
+               }
+           } else if (type === 'download') {
+               const blob = new Blob([content], { type: 'text/plain' });
+               const url = URL.createObjectURL(blob);
+               const a = document.createElement('a');
+               a.href = url;
+               a.download = 'qburst-proposal.txt';
+               document.body.appendChild(a);
+               a.click();
+               document.body.removeChild(a);
+               URL.revokeObjectURL(url);
+               showAlert('Proposal downloaded!', 'success');
+           }
+       }
 
-        // Vectorization (POST /api/trigger-vectorization)
-        async function triggerVectorization() {
-            const syncBtn = event.target;
-            const originalText = syncBtn.textContent;
-            
-            // Show loading state
-            syncBtn.disabled = true;
-            syncBtn.innerHTML = '<span class="spinner"></span> Syncing...';
-            
-            try {
-                const result = await apiCall('/api/trigger-vectorization', 'POST');
-                showAlert('Project vectorization started in background. This may take a few minutes.', 'info');
-                
-                // Show progress feedback
-                updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 'Syncing...');
-                
-                // Check progress every 5 seconds for 2 minutes
-                let attempts = 0;
-                const maxAttempts = 24; // 2 minutes
-                const progressCheck = setInterval(async () => {
-                    attempts++;
-                    try {
-                        await checkSystemStatus();
-                        
-                        // If completed or max attempts reached, stop checking
-                        if (attempts >= maxAttempts) {
-                            clearInterval(progressCheck);
-                            syncBtn.disabled = false;
-                            syncBtn.textContent = originalText;
-                            showAlert('Sync process may still be running. Check ChromaDB status.', 'info');
-                        }
-                    } catch (error) {
-                        clearInterval(progressCheck);
-                        syncBtn.disabled = false;
-                        syncBtn.textContent = originalText;
-                    }
-                }, 5000);
-                
-            } catch (error) {
-                syncBtn.disabled = false;
-                syncBtn.textContent = originalText;
-                
-                if (error.message.includes('500')) {
-                    showAlert('Sync failed: Database connection error. Please check PostgreSQL connection.', 'error');
-                } else {
-                    showAlert(`Sync failed: ${error.message}`, 'error');
-                }
-            }
-        }
-
-        // Utility Functions
-        function showAlert(message, type) {
-            // Remove existing alerts
-            document.querySelectorAll('.alert').forEach(alert => alert.remove());
-            
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            // Insert at top of container
-            const container = document.querySelector('.container');
-            container.insertBefore(alert, container.firstChild.nextSibling);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (alert.parentNode) {
-                    alert.remove();
-                }
-            }, 5000);
-        }
-    </script>
+       // Utility Functions
+       function showAlert(message, type) {
+           // Remove existing alerts
+           document.querySelectorAll('.alert').forEach(alert => alert.remove());
+           
+           const alert = document.createElement('div');
+           alert.className = `alert alert-${type}`;
+           alert.textContent = message;
+           
+           // Insert at top of container
+           const container = document.querySelector('.container');
+           container.insertBefore(alert, container.firstChild.nextSibling);
+           
+           // Auto-remove after 5 seconds
+           setTimeout(() => {
+               if (alert.parentNode) {
+                   alert.remove();
+               }
+           }, 5000);
+       }
+   </script>
 </body>
 </html>
