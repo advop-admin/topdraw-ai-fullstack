@@ -14,6 +14,7 @@ services:
     depends_on:
       - bdt-backend
     networks:
+      - default
       - takumi-bdt-network
     restart: unless-stopped
     healthcheck:
@@ -38,6 +39,7 @@ services:
     depends_on:
       - chroma
     networks:
+      - default
       - takumi-bdt-network
     restart: unless-stopped
     healthcheck:
@@ -72,6 +74,9 @@ volumes:
     name: qb_takumiai_bdt_fullstack_chroma_data
 
 networks:
+  default:
+    external:
+      name: takumi-pm-fullstack_default
   takumi-bdt-network:
     driver: bridge
     name: qb_takumiai_bdt_fullstack_takumi-bdt-network
