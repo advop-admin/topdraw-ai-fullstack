@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QBurst BDT Dashboard - POC v2.0</title>
+    <title>QBurst Business Development Tool</title>
     <style>
         :root {
-            --primary-blue: #2563eb;
-            --primary-blue-light: #3b82f6;
+            --qburst-blue: #2563eb;
+            --qburst-blue-light: #3b82f6;
             --success-green: #10b981;
             --warning-orange: #f59e0b;
             --error-red: #ef4444;
@@ -29,7 +29,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--gray-50);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             color: var(--gray-800);
             line-height: 1.6;
         }
@@ -46,33 +46,74 @@
         /* Header */
         .header {
             background: white;
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: 32px;
             margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         .header h1 {
-            color: var(--primary-blue);
-            font-size: 28px;
-            font-weight: 700;
+            color: var(--qburst-blue);
+            font-size: 32px;
+            font-weight: 800;
             margin-bottom: 8px;
         }
 
         .header p {
             color: var(--gray-600);
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: 500;
         }
 
-        .version-badge {
-            display: inline-block;
-            background: var(--primary-blue);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+        .header .subtitle {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        /* System Status Banner */
+        .system-status {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success-green);
+        }
+
+        .status-icon.loading {
+            background: var(--warning-orange);
+            animation: pulse 2s infinite;
+        }
+
+        .status-icon.error {
+            background: var(--error-red);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
             font-weight: 600;
-            margin-left: 8px;
+            color: var(--gray-700);
+        }
+
+        .status-subtext {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin-left: auto;
         }
 
         /* Tab Navigation */
@@ -80,27 +121,29 @@
             display: flex;
             background: white;
             border-radius: 12px;
-            padding: 6px;
+            padding: 8px;
             margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .tab-button {
             flex: 1;
-            padding: 12px 24px;
+            padding: 16px 24px;
             border: none;
             background: transparent;
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.3s;
             color: var(--gray-600);
         }
 
         .tab-button.active {
-            background: var(--primary-blue);
+            background: var(--qburst-blue);
             color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
         .tab-button:hover:not(.active) {
@@ -120,22 +163,22 @@
 
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: 32px;
             margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .card h3 {
             color: var(--gray-800);
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 16px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
         }
 
         /* Forms */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group label {
@@ -143,24 +186,28 @@
             font-weight: 600;
             margin-bottom: 8px;
             color: var(--gray-700);
+            font-size: 16px;
         }
 
         .form-group input, .form-group textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 16px 20px;
             border: 2px solid var(--gray-200);
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
-            transition: border-color 0.2s;
+            transition: all 0.3s;
+            background: var(--gray-50);
         }
 
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
-            border-color: var(--primary-blue);
+            border-color: var(--qburst-blue);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .form-group textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
         }
 
@@ -168,25 +215,28 @@
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
+            gap: 12px;
+            padding: 16px 32px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             text-decoration: none;
-            min-height: 44px;
+            min-height: 56px;
         }
 
         .btn-primary {
-            background: var(--primary-blue);
+            background: var(--qburst-blue);
             color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
         .btn-primary:hover {
-            background: var(--primary-blue-light);
+            background: var(--qburst-blue-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
         }
 
         .btn-secondary {
@@ -199,8 +249,9 @@
         }
 
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none !important;
         }
 
         /* Loading Spinner */
@@ -208,9 +259,9 @@
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 2px solid #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: transparent;
+            border-top-color: white;
             animation: spin 1s ease-in-out infinite;
         }
 
@@ -221,123 +272,137 @@
         /* Results Display */
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
         }
 
         .result-card {
             background: var(--gray-50);
-            border: 1px solid var(--gray-200);
-            border-radius: 8px;
-            padding: 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .result-card:hover {
+            border-color: var(--qburst-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .result-card h4 {
             color: var(--gray-800);
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
         .result-card p {
             color: var(--gray-600);
             font-size: 14px;
             margin-bottom: 8px;
+            line-height: 1.5;
         }
 
         .score-badge {
             display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             background: var(--success-green);
             color: white;
         }
 
         /* Proposal Editor */
         #proposalEditor {
-            min-height: 400px;
+            min-height: 500px;
             border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 24px;
             font-family: inherit;
-            line-height: 1.6;
+            line-height: 1.7;
+            background: var(--gray-50);
+            transition: all 0.3s;
         }
 
         #proposalEditor:focus {
             outline: none;
-            border-color: var(--primary-blue);
-        }
-
-        /* Footer Status Bar */
-        .status-bar {
+            border-color: var(--qburst-blue);
             background: white;
-            border-radius: 12px;
-            padding: 16px 24px;
-            margin-top: auto;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            align-items: center;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--gray-300);
-        }
-
-        .status-indicator.healthy {
-            background: var(--success-green);
-        }
-
-        .status-indicator.warning {
-            background: var(--warning-orange);
-        }
-
-        .status-indicator.error {
-            background: var(--error-red);
         }
 
         /* Alert Messages */
         .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             font-weight: 500;
-            white-space: pre-line;
+            border: 1px solid;
         }
 
         .alert-success {
             background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--success-green);
+            border-color: var(--success-green);
             color: #047857;
         }
 
         .alert-error {
             background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--error-red);
+            border-color: var(--error-red);
             color: #dc2626;
         }
 
         .alert-info {
             background: rgba(37, 99, 235, 0.1);
-            border: 1px solid var(--primary-blue);
+            border-color: var(--qburst-blue);
             color: #1d4ed8;
+        }
+
+        /* Loading States */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .loading-content {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--qburst-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        /* Offline Message */
+        .offline-banner {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 1px solid #f87171;
+            color: #991b1b;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 600;
         }
 
         /* Hidden class */
@@ -355,25 +420,12 @@
                 font-size: 24px;
             }
 
-            .tab-button {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-
             .card {
-                padding: 20px;
+                padding: 24px;
             }
 
             .results-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .status-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .status-item {
-                justify-content: space-between;
             }
         }
     </style>
@@ -382,17 +434,30 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>QBurst BDT Dashboard <span class="version-badge">v2.0</span></h1>
-            <p>AI-powered client analysis and proposal generation with automatic setup</p>
+            <h1>QBurst Business Development Tool</h1>
+            <p>AI-Powered Client Analysis & Proposal Generation</p>
+            <div class="subtitle">Professional tools for intelligent business development</div>
+        </div>
+
+        <!-- System Status (Hidden when working) -->
+        <div id="systemStatus" class="system-status hidden">
+            <div class="status-icon" id="statusIcon"></div>
+            <div class="status-text" id="statusText">System Ready</div>
+            <div class="status-subtext" id="statusSubtext"></div>
+        </div>
+
+        <!-- Offline Banner (Hidden by default) -->
+        <div id="offlineBanner" class="offline-banner hidden">
+            🔌 System temporarily unavailable. Please try again in a few moments or contact IT support.
         </div>
 
         <!-- Tab Navigation -->
         <div class="tab-nav">
             <button class="tab-button active" onclick="switchTab('client-analysis')">
-                Client Analysis
+                📊 Client Analysis
             </button>
             <button class="tab-button" onclick="switchTab('proposal-generation')">
-                Proposal Generation
+                📝 Proposal Generation
             </button>
         </div>
 
@@ -400,24 +465,28 @@
         <div id="client-analysis" class="tab-content active">
             <div class="card">
                 <h3>Client Analysis</h3>
+                <p style="color: var(--gray-600); margin-bottom: 24px;">
+                    Enter client information to analyze their business profile and find relevant QBurst project experience.
+                </p>
+                
                 <form id="clientForm">
                     <div class="form-group">
-                        <label for="clientName">Client Name *</label>
-                        <input type="text" id="clientName" required placeholder="e.g., Acme Corporation">
+                        <label for="clientName">Client Company Name *</label>
+                        <input type="text" id="clientName" required placeholder="e.g., Apollo Hospitals, Infosys, Amazon">
                     </div>
                     
                     <div class="form-group">
-                        <label for="clientWebsite">Website URL *</label>
-                        <input type="url" id="clientWebsite" required placeholder="https://example.com">
+                        <label for="clientWebsite">Company Website *</label>
+                        <input type="url" id="clientWebsite" required placeholder="https://company.com">
                     </div>
                     
                     <div class="form-group">
-                        <label for="socialUrls">Social Media URLs (Optional)</label>
-                        <textarea id="socialUrls" placeholder="Enter LinkedIn, Twitter, Facebook URLs (one per line)"></textarea>
+                        <label for="socialUrls">LinkedIn/Social Media URLs (Optional)</label>
+                        <textarea id="socialUrls" placeholder="Enter LinkedIn company page, Twitter, or other social media URLs (one per line)"></textarea>
                     </div>
                     
                     <button type="submit" class="btn btn-primary" id="analyzeBtn">
-                        <span class="btn-text">Analyze Client</span>
+                        <span class="btn-text">🔍 Analyze Client</span>
                         <span class="spinner hidden"></span>
                     </button>
                 </form>
@@ -429,7 +498,7 @@
                 <div id="clientData"></div>
                 <div id="matchedProjects"></div>
                 <button class="btn btn-primary" onclick="proceedToProposal()">
-                    Generate Proposal
+                    📝 Generate Proposal
                 </button>
             </div>
         </div>
@@ -438,14 +507,18 @@
         <div id="proposal-generation" class="tab-content">
             <div class="card">
                 <h3>Proposal Generation</h3>
+                <p style="color: var(--gray-600); margin-bottom: 24px;">
+                    Generate a customized proposal based on client analysis and QBurst's relevant project experience.
+                </p>
+                
                 <div id="proposalForm">
                     <div class="form-group">
-                        <label for="customRequirements">Custom Requirements (Optional)</label>
-                        <textarea id="customRequirements" placeholder="Any specific requirements for this proposal..."></textarea>
+                        <label for="customRequirements">Additional Requirements (Optional)</label>
+                        <textarea id="customRequirements" placeholder="Any specific requirements, technologies, or focus areas for this proposal..."></textarea>
                     </div>
                     
                     <button class="btn btn-primary" id="generateBtn" onclick="generateProposal()">
-                        <span class="btn-text">Generate Proposal</span>
+                        <span class="btn-text">✨ Generate Proposal</span>
                         <span class="spinner hidden"></span>
                     </button>
                 </div>
@@ -455,113 +528,147 @@
             <div id="proposalContainer" class="card hidden">
                 <h3>Generated Proposal</h3>
                 <div id="proposalMeta"></div>
-                <div contenteditable="true" id="proposalEditor"></div>
+                <div contenteditable="true" id="proposalEditor" placeholder="Your AI-generated proposal will appear here..."></div>
                 
-                <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-primary" onclick="exportProposal('copy')">Copy to Clipboard</button>
-                    <button class="btn btn-secondary" onclick="exportProposal('download')">Download as Text</button>
-                    <button class="btn btn-secondary" onclick="regenerateSection()">Regenerate Section</button>
+                <div style="margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="exportProposal('copy')">
+                        📋 Copy to Clipboard
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportProposal('download')">
+                        💾 Download as Document
+                    </button>
+                    <button class="btn btn-secondary" onclick="regenerateSection()">
+                        🔄 Regenerate Section
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Enhanced Status Bar -->
-        <div class="status-bar">
-            <div class="status-grid">
-                <div class="status-item">
-                    <div class="status-indicator" id="apiStatus"></div>
-                    <span>API Status: <span id="apiStatusText">Checking...</span></span>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-indicator" id="chromaStatus"></div>
-                    <span>ChromaDB: <span id="chromaStatusText">Checking...</span></span>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-indicator" id="vectorStatus"></div>
-                    <span>Data Sync: <span id="vectorStatusText">Checking...</span></span>
-                </div>
-                
-                <div class="status-item">
-                    <button class="btn btn-secondary" onclick="triggerVectorization()" id="syncBtn">
-                        Sync Projects
-                    </button>
-                    <small style="color: var(--gray-600); margin-left: 8px;">
-                        Manual sync with 10min timeout
-                    </small>
-                </div>
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <h3 style="margin-bottom: 8px;">Processing...</h3>
+                <p id="loadingText">Analyzing client information with AI</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuration
         const API_BASE_URL = 'http://localhost:8000';
         
         // Global state
         let analysisData = null;
+        let systemInitialized = false;
 
-        // Initialize app with enhanced startup detection
+        // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
-            checkSystemStatus();
+            initializeSystem();
             
             // Set up form submission
             document.getElementById('clientForm').addEventListener('submit', handleClientAnalysis);
             
-            // Check startup status initially
-            checkStartupStatus();
-            
-            // Auto-refresh status every 30 seconds
-            setInterval(checkSystemStatus, 30000);
-            
-            // Check startup status every 10 seconds for the first 2 minutes
-            const startupCheckInterval = setInterval(() => {
-                checkStartupStatus();
-            }, 10000);
-            
-            // Stop startup checking after 2 minutes
-            setTimeout(() => {
-                clearInterval(startupCheckInterval);
-            }, 120000);
+            // Check system status every 30 seconds
+            setInterval(checkSystemHealth, 30000);
         });
 
-        async function checkStartupStatus() {
+        // System Initialization - Silent for Business Users
+        async function initializeSystem() {
             try {
-                const startupInfo = await apiCall('/api/startup-status');
+                // Silent background checks
+                const [health, stats] = await Promise.all([
+                    apiCall('/api/health'),
+                    apiCall('/api/chroma-stats')
+                ]);
                 
-                if (startupInfo.startup_vectorization) {
-                    const status = startupInfo.startup_vectorization.status;
-                    const message = startupInfo.startup_vectorization.message;
-                    
-                    if (status === 'completed') {
-                        // Auto-vectorization completed successfully
-                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 
-                            `Auto-sync: ${message}`);
-                        showAlert(`🎉 Startup completed! ${message} automatically loaded.`, 'success');
-                    } else if (status === 'failed' || status === 'error') {
-                        // Auto-vectorization failed, manual sync available
-                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
-                            `Auto-sync failed: Manual sync available`);
-                    }
+                const projectCount = stats.document_count || 0;
+                
+                if (projectCount > 0) {
+                    // System is ready - hide any status banners
+                    hideSystemStatus();
+                    systemInitialized = true;
+                } else {
+                    // Try to initialize silently
+                    await silentSystemInit();
                 }
                 
-                // Refresh project count
-                checkSystemStatus();
+            } catch (error) {
+                // Show offline banner only if system is completely unavailable
+                showOfflineBanner();
+            }
+        }
+
+        // Silent system initialization
+        async function silentSystemInit() {
+            try {
+                // Try to trigger initialization without exposing technical details
+                await apiCall('/api/trigger-vectorization', 'POST');
+                
+                // Wait and check if it worked
+                setTimeout(async () => {
+                    try {
+                        const stats = await apiCall('/api/chroma-stats');
+                        if (stats.document_count > 0) {
+                            hideSystemStatus();
+                            systemInitialized = true;
+                        } else {
+                            // If still no projects, show loading state
+                            showSystemLoading();
+                        }
+                    } catch (error) {
+                        showOfflineBanner();
+                    }
+                }, 10000);
                 
             } catch (error) {
-                // Startup status endpoint might not be available yet
-                console.log('Startup status check failed:', error.message);
+                showSystemLoading();
+            }
+        }
+
+        // System status management (minimal exposure)
+        function showSystemLoading() {
+            const statusDiv = document.getElementById('systemStatus');
+            const icon = document.getElementById('statusIcon');
+            const text = document.getElementById('statusText');
+            const subtext = document.getElementById('statusSubtext');
+            
+            icon.className = 'status-icon loading';
+            text.textContent = 'System Initializing...';
+            subtext.textContent = 'Please wait a moment';
+            statusDiv.classList.remove('hidden');
+        }
+
+        function hideSystemStatus() {
+            document.getElementById('systemStatus').classList.add('hidden');
+            document.getElementById('offlineBanner').classList.add('hidden');
+        }
+
+        function showOfflineBanner() {
+            document.getElementById('offlineBanner').classList.remove('hidden');
+            document.getElementById('systemStatus').classList.add('hidden');
+        }
+
+        // Health check (silent)
+        async function checkSystemHealth() {
+            try {
+                const stats = await apiCall('/api/chroma-stats');
+                if (stats.document_count > 0 && !systemInitialized) {
+                    hideSystemStatus();
+                    systemInitialized = true;
+                }
+            } catch (error) {
+                // Only show offline banner if system becomes unavailable
+                if (systemInitialized) {
+                    showOfflineBanner();
+                }
             }
         }
 
         // Tab switching
         function switchTab(tabName) {
-            // Update tab buttons
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Update tab content
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
         }
@@ -570,9 +677,7 @@
         async function apiCall(endpoint, method = 'GET', data = null) {
             const options = {
                 method,
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: { 'Content-Type': 'application/json' }
             };
             
             if (data) {
@@ -584,304 +689,29 @@
                 }
             }
             
-            try {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('API Error:', error);
-                showAlert(`API Error: ${error.message}`, 'error');
-                throw error;
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+            if (!response.ok) {
+                throw new Error(`Service temporarily unavailable`);
             }
+            return await response.json();
         }
 
-        // System Status Check with startup vectorization awareness
-        async function checkSystemStatus() {
-            try {
-                // Check API health with startup status
-                const health = await apiCall('/api/health');
-                updateStatusIndicator('apiStatus', 'apiStatusText', 'healthy', health.status);
-                
-                // Handle startup vectorization status
-                if (health.startup_vectorization) {
-                    const startupStatus = health.startup_vectorization.status;
-                    const startupMessage = health.startup_vectorization.message;
-                    
-                    if (startupStatus === 'completed') {
-                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 
-                            `Auto-sync: ${startupMessage}`);
-                    } else if (startupStatus === 'failed' || startupStatus === 'error') {
-                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
-                            `Auto-sync failed: ${startupMessage}`);
-                    } else {
-                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
-                            `Auto-sync: ${startupMessage}`);
-                    }
-                }
-                
-            } catch (error) {
-                updateStatusIndicator('apiStatus', 'apiStatusText', 'error', 'Offline');
-            }
-
-            try {
-                // Check ChromaDB stats
-                const stats = await apiCall('/api/chroma-stats');
-                const projectCount = stats.document_count || 0;
-                
-                if (projectCount === 0) {
-                    updateStatusIndicator('chromaStatus', 'chromaStatusText', 'warning', 
-                        'No projects (Sync needed)');
-                } else {
-                    updateStatusIndicator('chromaStatus', 'chromaStatusText', 'healthy', 
-                        `${projectCount} projects available`);
-                }
-                
-                // Update global project count
-                window.currentProjectCount = projectCount;
-                
-                // Update sync button text based on project count
-                updateSyncButtonState(projectCount);
-                
-            } catch (error) {
-                updateStatusIndicator('chromaStatus', 'chromaStatusText', 'error', 
-                    'Disconnected - Check ChromaDB service');
-            }
-        }
-
-        function updateSyncButtonState(projectCount) {
-            const syncBtn = document.getElementById('syncBtn');
-            if (syncBtn && !syncBtn.disabled) {
-                if (projectCount > 0) {
-                    syncBtn.textContent = 'Re-sync Projects';
-                    syncBtn.title = 'Re-vectorize all projects from database';
-                } else {
-                    syncBtn.textContent = 'Sync Projects';
-                    syncBtn.title = 'Load projects from database for the first time';
-                }
-            }
-        }
-
-        function updateStatusIndicator(indicatorId, textId, status, text) {
-            const indicator = document.getElementById(indicatorId);
-            const textElement = document.getElementById(textId);
-            
-            indicator.className = `status-indicator ${status}`;
-            textElement.textContent = text;
-        }
-
-        // Enhanced Sync Function with extended timeout for large datasets
-        async function triggerVectorization() {
-            const syncBtn = event.target;
-            const originalText = syncBtn.textContent;
-            
-            // Show loading state
-            syncBtn.disabled = true;
-            syncBtn.innerHTML = '<span class="spinner"></span> Starting sync...';
-            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 'Initializing manual sync...');
-            
-            try {
-                const result = await apiCall('/api/trigger-vectorization', 'POST');
-                
-                // Show immediate feedback
-                showAlert(`Manual sync started: ${result.message}`, 'info');
-                updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 
-                    'Manual sync: Step 1/4 - Connecting to PostgreSQL...');
-                
-                // Extended progress tracking for large datasets
-                let attempts = 0;
-                const maxAttempts = 50; // 50 attempts = ~3.5 minutes with 4-second intervals
-                let lastProjectCount = 0;
-                
-                const progressCheck = setInterval(async () => {
-                    attempts++;
-                    
-                    try {
-                        const [vectorStatus, chromaStats] = await Promise.all([
-                            apiCall('/api/vectorization-status'),
-                            apiCall('/api/chroma-stats')
-                        ]);
-                        
-                        const projectCount = chromaStats.document_count || 0;
-                        const progressPercent = Math.round((attempts / maxAttempts) * 100);
-                        
-                        // Show detailed progress steps with extended timeline
-                        let stepMessage = '';
-                        if (attempts <= 5) {
-                            stepMessage = `Manual sync: Step 1/4 - Connecting to PostgreSQL... (${progressPercent}%)`;
-                        } else if (attempts <= 15) {
-                            stepMessage = `Manual sync: Step 2/4 - Reading project data... (${progressPercent}%)`;
-                        } else if (attempts <= 35) {
-                            stepMessage = `Manual sync: Step 3/4 - Creating embeddings... (${progressPercent}%)`;
-                        } else {
-                            stepMessage = `Manual sync: Step 4/4 - Finalizing sync... (${progressPercent}%)`;
-                        }
-                        
-                        // Add project count info
-                        if (projectCount > lastProjectCount) {
-                            stepMessage += ` - ${projectCount} projects processed`;
-                            lastProjectCount = projectCount;
-                        } else if (projectCount > 0) {
-                            stepMessage += ` - ${projectCount} projects found`;
-                        } else {
-                            stepMessage += ` - No projects found yet`;
-                        }
-                        
-                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', stepMessage);
-                        
-                        // Success detection - if we have projects, that's success!
-                        if (projectCount > 0) {
-                            clearInterval(progressCheck);
-                            syncBtn.disabled = false;
-                            syncBtn.textContent = 'Re-sync Projects';
-                            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 
-                                `Manual sync completed successfully`);
-                            updateStatusIndicator('chromaStatus', 'chromaStatusText', 'healthy', 
-                                `${projectCount} projects available`);
-                            showAlert(`✅ Manual sync completed! Successfully loaded ${projectCount} projects from PostgreSQL.`, 'success');
-                            
-                            // Update global count and remove demo button if it exists
-                            window.currentProjectCount = projectCount;
-                            const demoBtn = document.getElementById('demoModeBtn');
-                            if (demoBtn) demoBtn.remove();
-                            
-                            return;
-                        }
-                        
-                        // Extended timeout handling
-                        if (attempts >= maxAttempts) {
-                            clearInterval(progressCheck);
-                            syncBtn.disabled = false;
-                            syncBtn.textContent = originalText;
-                            
-                            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 
-                                'Manual sync timeout - No projects loaded');
-                            showAlert(`⏱️ Manual sync timeout: No projects were loaded after ${Math.round(maxAttempts * 4 / 60)} minutes.
-
-**This suggests a deeper issue:**
-
-🔍 **Troubleshooting steps:**
-1. **Check backend logs**: \`docker logs qb_takumiai_bdt_fullstack_bdt-backend_1\`
-2. **Verify PostgreSQL data**: \`docker exec -it takumi-pm-fullstack-postgres-1 psql -U postgres -d takumi_pm -c "SELECT COUNT(*) FROM projects;"\`
-3. **Check DATABASE_URL**: Should be \`host.docker.internal:5432\`
-4. **Try manual vectorization**: \`docker exec -it qb_takumiai_bdt_fullstack_bdt-backend_1 python /app/scripts/vectorize_projects.py\`
-
-**Expected startup behavior:**
-- Fresh containers should auto-vectorize projects on startup
-- If auto-vectorization failed, check startup logs
-
-**Quick test option:**
-Use Demo Mode below to test the UI with sample data.`, 'error');
-                            
-                            // Add demo mode button for testing
-                            addDemoModeButton();
-                        }
-                        
-                    } catch (error) {
-                        clearInterval(progressCheck);
-                        syncBtn.disabled = false;
-                        syncBtn.textContent = originalText;
-                        updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 'Manual sync monitoring failed');
-                        showAlert(`❌ Manual sync error: ${error.message}
-
-Try refreshing the page and checking backend logs for more details.`, 'error');
-                    }
-                }, 4000); // Check every 4 seconds
-                
-            } catch (error) {
-                syncBtn.disabled = false;
-                syncBtn.textContent = originalText;
-                
-                if (error.message.includes('500')) {
-                    updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 'Backend script error');
-                    showAlert(`❌ Manual sync failed: Backend error
-
-**Error:** ${error.message}
-
-**Common causes:**
-- PostgreSQL connection issues
-- Database schema problems  
-- Script execution permissions
-- ChromaDB connection problems
-
-**Quick fixes:**
-1. **Check auto-vectorization**: Fresh containers should auto-load projects
-2. **Restart containers**: \`docker-compose restart\`
-3. **Use Demo Mode**: Test UI functionality with sample data
-
-**Backend logs:** \`docker logs qb_takumiai_bdt_fullstack_bdt-backend_1\``, 'error');
-                    addDemoModeButton();
-                } else {
-                    updateStatusIndicator('vectorStatus', 'vectorStatusText', 'error', 'Manual sync failed');
-                    showAlert(`❌ Manual sync failed: ${error.message}
-
-Check backend logs and try again, or use Demo Mode for testing.`, 'error');
-                    addDemoModeButton();
-                }
-            }
-        }
-
-        // Add demo mode for testing without database
-        function addDemoModeButton() {
-            // Check if button already exists
-            if (document.getElementById('demoModeBtn')) return;
-            
-            const statusBar = document.querySelector('.status-bar .status-grid');
-            const demoDiv = document.createElement('div');
-            demoDiv.className = 'status-item';
-            demoDiv.innerHTML = `
-                <button class="btn btn-secondary" id="demoModeBtn" onclick="enableDemoMode()">
-                    Demo Mode
-                </button>
-                <small style="color: var(--gray-600); margin-left: 8px;">
-                    Load sample projects
-                </small>
-            `;
-            statusBar.appendChild(demoDiv);
-        }
-
-        // Demo mode function
-        async function enableDemoMode() {
-            const demoBtn = document.getElementById('demoModeBtn');
-            demoBtn.disabled = true;
-            demoBtn.innerHTML = '<span class="spinner"></span> Loading demo data...';
-            
-            // Simulate adding projects to ChromaDB (this would be a backend endpoint)
-            updateStatusIndicator('vectorStatus', 'vectorStatusText', 'warning', 'Loading demo projects...');
-            
-            // Simulate progress
-            setTimeout(() => {
-                updateStatusIndicator('vectorStatus', 'vectorStatusText', 'healthy', 'Demo mode active');
-                updateStatusIndicator('chromaStatus', 'chromaStatusText', 'healthy', '15 demo projects loaded');
-                showAlert(`🎯 Demo Mode Activated! 
-
-- 15 sample projects loaded
-- Client analysis will work normally  
-- Project matching will show demo results
-- All features are testable
-
-Try analyzing a client now!`, 'success');
-                
-                demoBtn.disabled = false;
-                demoBtn.textContent = 'Demo Active';
-                demoBtn.style.background = 'var(--success-green)';
-                demoBtn.style.color = 'white';
-            }, 3000);
-        }
-
-        // Client Analysis (POST /api/analyze-client)
+        // Client Analysis
         async function handleClientAnalysis(event) {
             event.preventDefault();
             
             const analyzeBtn = document.getElementById('analyzeBtn');
             const btnText = analyzeBtn.querySelector('.btn-text');
             const spinner = analyzeBtn.querySelector('.spinner');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
             
-            // Show loading state
+            // Show professional loading state
             analyzeBtn.disabled = true;
-            btnText.textContent = 'Analyzing...';
+            btnText.textContent = '🔍 Analyzing...';
             spinner.classList.remove('hidden');
+            loadingOverlay.classList.remove('hidden');
+            loadingText.textContent = 'Analyzing client website and business profile...';
             
             try {
                 // Prepare form data
@@ -889,12 +719,14 @@ Try analyzing a client now!`, 'success');
                 formData.append('name', document.getElementById('clientName').value);
                 formData.append('website', document.getElementById('clientWebsite').value);
                
-               // Handle social URLs
                const socialUrls = document.getElementById('socialUrls').value
                    .split('\n')
                    .filter(url => url.trim())
                    .map(url => url.trim());
                formData.append('social_urls', JSON.stringify(socialUrls));
+               
+               // Update loading text
+               loadingText.textContent = 'Finding similar QBurst projects...';
                
                // Make API call
                const result = await apiCall('/api/analyze-client', 'POST', formData);
@@ -902,18 +734,25 @@ Try analyzing a client now!`, 'success');
                // Store for proposal generation
                analysisData = result;
                
+               // Update loading text
+               loadingText.textContent = 'Preparing analysis results...';
+               
+               // Small delay for smooth UX
+               await new Promise(resolve => setTimeout(resolve, 1000));
+               
                // Display results
                displayAnalysisResults(result);
                
-               showAlert('Client analysis completed successfully!', 'success');
+               showAlert('✅ Client analysis completed successfully! Found relevant project matches.', 'success');
                
            } catch (error) {
-               showAlert('Failed to analyze client. Please try again.', 'error');
+               showAlert('❌ Unable to analyze client at this time. Please check the website URL and try again.', 'error');
            } finally {
                // Reset button state
                analyzeBtn.disabled = false;
-               btnText.textContent = 'Analyze Client';
+               btnText.textContent = '🔍 Analyze Client';
                spinner.classList.add('hidden');
+               loadingOverlay.classList.add('hidden');
            }
        }
 
@@ -922,51 +761,42 @@ Try analyzing a client now!`, 'success');
            const clientDataContainer = document.getElementById('clientData');
            const projectsContainer = document.getElementById('matchedProjects');
            
-           // Display client data
+           // Display client data with professional formatting
            const clientData = data.scraped_data;
            clientDataContainer.innerHTML = `
-               <div class="result-card">
-                   <h4>Company Information</h4>
-                   <p><strong>Industry:</strong> ${clientData.industry || 'Not specified'}</p>
+               <div class="result-card" style="border: 2px solid var(--qburst-blue); background: rgba(37, 99, 235, 0.05);">
+                   <h4>📊 Company Profile</h4>
+                   <p><strong>Industry:</strong> ${clientData.industry || 'Technology/General'}</p>
                    <p><strong>Company Size:</strong> ${clientData.company_size || 'Not specified'}</p>
-                   <p><strong>Services:</strong> ${clientData.services.join(', ') || 'None listed'}</p>
-                   <p><strong>Tech Stack:</strong> ${clientData.tech_stack.join(', ') || 'None identified'}</p>
-                   <p><strong>Description:</strong> ${clientData.company_description || 'No description available'}</p>
-                   <div class="score-badge">AI Confidence: ${Math.round(clientData.confidence_score * 100)}%</div>
-                   <small style="display: block; margin-top: 8px; color: var(--gray-600);">
-                       <strong>Note:</strong> Confidence score indicates how accurate the AI believes this analysis is based on available data quality.
-                   </small>
+                   <p><strong>Core Services:</strong> ${clientData.services.join(', ') || 'Business services'}</p>
+                   <p><strong>Technology Stack:</strong> ${clientData.tech_stack.join(', ') || 'Various technologies'}</p>
+                   <p><strong>Business Overview:</strong> ${clientData.company_description || 'Professional services company'}</p>
+                   <div class="score-badge">Analysis Confidence: ${Math.round(clientData.confidence_score * 100)}%</div>
                </div>
            `;
            
-           // Display matched projects
+           // Display matched projects with business focus
            if (data.matched_projects && data.matched_projects.length > 0) {
                projectsContainer.innerHTML = `
-                   <h4 style="margin-top: 20px;">Similar QBurst Projects</h4>
+                   <h4 style="margin-top: 24px; color: var(--gray-800);">🎯 Relevant QBurst Experience</h4>
                    <div class="results-grid">
                        ${data.matched_projects.map(project => `
                            <div class="result-card">
                                <h4>${project.project_name}</h4>
                                <p><strong>Industry:</strong> ${project.industry_vertical}</p>
                                <p><strong>Client Type:</strong> ${project.client_type}</p>
-                               <p><strong>Description:</strong> ${project.project_description}</p>
-                               <div class="score-badge">Similarity: ${Math.round(project.similarity_score * 100)}%</div>
+                               <p><strong>Project Scope:</strong> ${project.project_description}</p>
+                               <div class="score-badge">Relevance: ${Math.round(project.similarity_score * 100)}%</div>
                            </div>
                        `).join('')}
                    </div>
                `;
            } else {
                projectsContainer.innerHTML = `
-                   <div class="alert alert-info" style="margin-top: 20px;">
-                       <strong>No similar projects found.</strong><br>
-                       This could be because:
-                       <ul style="margin: 8px 0 0 20px;">
-                           <li>ChromaDB has no project data (shows "0 projects" below)</li>
-                           <li>No projects match this client's profile</li>
-                           <li>Database needs to be synced with project data</li>
-                       </ul>
-                       <br>
-                       <em>Try clicking "Sync Projects" below to load project data from PostgreSQL.</em>
+                   <div class="alert alert-info" style="margin-top: 24px;">
+                       <strong>📋 Project Analysis</strong><br>
+                       While we have extensive project experience, no direct matches were found for this specific client profile. 
+                       Our proposal will highlight QBurst's broader capabilities and relevant industry experience.
                    </div>
                `;
            }
@@ -980,21 +810,25 @@ Try analyzing a client now!`, 'success');
            document.querySelectorAll('.tab-button')[1].click();
        }
 
-       // Proposal Generation (POST /api/generate-proposal)
+       // Proposal Generation
        async function generateProposal() {
            if (!analysisData) {
-               showAlert('Please analyze a client first.', 'error');
+               showAlert('❌ Please complete client analysis first before generating a proposal.', 'error');
                return;
            }
            
            const generateBtn = document.getElementById('generateBtn');
            const btnText = generateBtn.querySelector('.btn-text');
            const spinner = generateBtn.querySelector('.spinner');
+           const loadingOverlay = document.getElementById('loadingOverlay');
+           const loadingText = document.getElementById('loadingText');
            
-           // Show loading state
+           // Show professional loading state
            generateBtn.disabled = true;
-           btnText.textContent = 'Generating...';
+           btnText.textContent = '✨ Generating...';
            spinner.classList.remove('hidden');
+           loadingOverlay.classList.remove('hidden');
+           loadingText.textContent = 'Creating customized proposal...';
            
            try {
                const customRequirements = document.getElementById('customRequirements').value;
@@ -1010,18 +844,26 @@ Try analyzing a client now!`, 'success');
                    custom_requirements: customRequirements || null
                };
                
+               loadingText.textContent = 'Incorporating QBurst project experience...';
+               
                const result = await apiCall('/api/generate-proposal', 'POST', requestData);
                
+               loadingText.textContent = 'Finalizing proposal document...';
+               
+               // Small delay for smooth UX
+               await new Promise(resolve => setTimeout(resolve, 1500));
+               
                displayProposal(result);
-               showAlert('Proposal generated successfully!', 'success');
+               showAlert('✅ Proposal generated successfully! Review and customize as needed.', 'success');
                
            } catch (error) {
-               showAlert('Failed to generate proposal. Please try again.', 'error');
+               showAlert('❌ Unable to generate proposal at this time. Please try again or contact support.', 'error');
            } finally {
                // Reset button state
                generateBtn.disabled = false;
-               btnText.textContent = 'Generate Proposal';
+               btnText.textContent = '✨ Generate Proposal';
                spinner.classList.add('hidden');
+               loadingOverlay.classList.add('hidden');
            }
        }
 
@@ -1030,26 +872,34 @@ Try analyzing a client now!`, 'success');
            const meta = document.getElementById('proposalMeta');
            const editor = document.getElementById('proposalEditor');
            
-           // Display metadata
+           // Display metadata with professional formatting
            meta.innerHTML = `
-               <div style="background: var(--gray-50); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
-                   <small>
-                       Generated: ${new Date(data.generation_timestamp).toLocaleString()} | 
-                       Processing Time: ${data.processing_time.toFixed(2)}s | 
-                       Word Count: ${data.word_count}
+               <div style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--qburst-blue);">
+                   <div style="font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">
+                       📄 Proposal Generated Successfully
+                   </div>
+                   <small style="color: var(--gray-600);">
+                       Created: ${new Date(data.generation_timestamp).toLocaleString()} | 
+                       Word Count: ${data.word_count} | 
+                       Processing Time: ${data.processing_time.toFixed(1)}s
                    </small>
                </div>
            `;
            
-           // Display proposal content
-           editor.innerHTML = data.proposal_content.replace(/\n/g, '<br>');
+           // Display proposal content with better formatting
+           const formattedContent = data.proposal_content
+               .replace(/\n/g, '<br>')
+               .replace(/#{1,3}\s*([^\n]+)/g, '<h3 style="color: var(--qburst-blue); margin: 24px 0 12px 0; font-weight: 700;">$1</h3>')
+               .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+           
+           editor.innerHTML = formattedContent;
            
            container.classList.remove('hidden');
        }
 
-       // Section Regeneration (POST /api/regenerate-section)
+       // Section Regeneration
        async function regenerateSection() {
-           const sectionName = prompt('Enter section name to regenerate (e.g., "Executive Summary", "Technology Approach"):');
+           const sectionName = prompt('Enter the section name you want to regenerate (e.g., "Executive Summary", "Technology Approach"):');
            if (!sectionName) return;
            
            const requirements = prompt('Any specific requirements for this section?') || '';
@@ -1063,13 +913,13 @@ Try analyzing a client now!`, 'success');
                
                // Replace the section in the editor
                const editor = document.getElementById('proposalEditor');
-               const newContent = `\n\n## ${result.section_name}\n${result.section_content}\n\n`;
+               const newContent = `\n\n<h3 style="color: var(--qburst-blue); margin: 24px 0 12px 0; font-weight: 700;">${result.section_name}</h3>\n${result.section_content}\n\n`;
                editor.innerHTML += newContent.replace(/\n/g, '<br>');
                
-               showAlert(`Section "${sectionName}" regenerated successfully!`, 'success');
+               showAlert(`✅ Section "${sectionName}" regenerated successfully!`, 'success');
                
            } catch (error) {
-               showAlert('Failed to regenerate section. Please try again.', 'error');
+               showAlert(`❌ Unable to regenerate section. Please try again.`, 'error');
            }
        }
 
@@ -1080,25 +930,26 @@ Try analyzing a client now!`, 'success');
            if (type === 'copy') {
                try {
                    await navigator.clipboard.writeText(content);
-                   showAlert('Proposal copied to clipboard!', 'success');
+                   showAlert('✅ Proposal copied to clipboard! You can now paste it into any document.', 'success');
                } catch (error) {
-                   showAlert('Failed to copy to clipboard.', 'error');
+                   showAlert('❌ Unable to copy to clipboard. Please select and copy the text manually.', 'error');
                }
            } else if (type === 'download') {
+               const clientName = document.getElementById('clientName').value || 'Client';
                const blob = new Blob([content], { type: 'text/plain' });
                const url = URL.createObjectURL(blob);
                const a = document.createElement('a');
                a.href = url;
-               a.download = 'qburst-proposal.txt';
+               a.download = `QBurst_Proposal_${clientName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
                document.body.appendChild(a);
                a.click();
                document.body.removeChild(a);
                URL.revokeObjectURL(url);
-               showAlert('Proposal downloaded!', 'success');
+               showAlert('✅ Proposal downloaded successfully!', 'success');
            }
        }
 
-       // Utility Functions
+       // Alert system
        function showAlert(message, type) {
            // Remove existing alerts
            document.querySelectorAll('.alert').forEach(alert => alert.remove());
@@ -1109,7 +960,7 @@ Try analyzing a client now!`, 'success');
            
            // Insert at top of container
            const container = document.querySelector('.container');
-           container.insertBefore(alert, container.firstChild.nextSibling);
+           container.insertBefore(alert, container.children[1]);
            
            // Auto-remove after 5 seconds
            setTimeout(() => {
