@@ -1,0 +1,20 @@
+{
+    "agencies": [
+        {
+            "id": "1",
+            "name": "Digital Solutions Agency",
+            "specialties": ["Web Development", "Digital Marketing", "UI/UX Design"],
+            "team_size": 25,
+            "location": "San Francisco, CA",
+            "hourly_rate": 150,
+            "portfolio": [
+                {
+                    "project_name": "E-commerce Platform",
+                    "client": "Fashion Retailer",
+                    "duration": "6 months",
+                    "technologies": ["React", "Node.js", "MongoDB"]
+                }
+            ]
+        }
+    ]
+}

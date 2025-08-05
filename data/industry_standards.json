@@ -1,0 +1,33 @@
+{
+    "project_types": {
+        "web_development": {
+            "small": {
+                "duration_range": "2-4 months",
+                "budget_range": "20000-40000",
+                "team_size": "2-4"
+            },
+            "medium": {
+                "duration_range": "4-8 months",
+                "budget_range": "40000-100000",
+                "team_size": "4-8"
+            },
+            "large": {
+                "duration_range": "8+ months",
+                "budget_range": "100000+",
+                "team_size": "8+"
+            }
+        },
+        "digital_marketing": {
+            "basic": {
+                "duration_range": "3 months",
+                "budget_range": "5000-10000",
+                "deliverables": ["Social Media", "SEO", "Content Marketing"]
+            },
+            "premium": {
+                "duration_range": "6 months",
+                "budget_range": "10000-25000",
+                "deliverables": ["Social Media", "SEO", "PPC", "Content Marketing", "Email Marketing"]
+            }
+        }
+    }
+}

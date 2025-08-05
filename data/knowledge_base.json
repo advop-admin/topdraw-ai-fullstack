@@ -2,113 +2,62 @@
   "agencies": {
     "web_development": [
       {
-        "id": "wd_001",
-        "name": "DigitalCraft Studio",
-        "specialization": "React/Node.js, E-commerce, SaaS",
+        "id": "wd001",
+        "name": "TechCraft Solutions",
         "match_score": 95,
-        "portfolio_url": "https://digitalcraft.com",
-        "website": "https://digitalcraft.com",
+        "specialization": "Web & Mobile Development",
+        "strengths": ["React", "Node.js", "Cloud Solutions"],
+        "portfolio_highlights": ["E-commerce Platform", "SaaS Dashboard"],
         "location": "Dubai, UAE",
-        "strengths": ["E-commerce", "SaaS", "Startups", "React", "Node.js"],
-        "experience_years": 8,
-        "team_size": 25,
-        "hourly_rate": "$75-120",
-        "project_range": "$15K-200K",
-        "case_studies": [
-          {
-            "title": "FitFlow Pro - Fitness Platform",
-            "description": "Built scalable fitness coaching platform with AI integration",
-            "tech_stack": ["React", "Node.js", "MongoDB", "AWS"],
-            "budget": "$85K",
-            "timeline": "6 months"
-          },
-          {
-            "title": "EcoMart - Sustainable E-commerce",
-            "description": "Complete e-commerce solution for sustainable products",
-            "tech_stack": ["Next.js", "Stripe", "PostgreSQL", "Vercel"],
-            "budget": "$45K",
-            "timeline": "4 months"
-          }
-        ],
-        "availability": "Available for new projects",
-        "response_time": "24 hours",
-        "languages": ["English", "Arabic"]
+        "availability": "Available"
       }
-    ]
-  },
-  "market_insights": {
-    "uae": {
-      "digital_economy_growth": {
-        "metric": "Digital Economy Growth",
-        "value": "12.3%",
-        "source": "UAE Digital Economy Report 2024",
-        "trend": "up",
-        "description": "Annual growth rate of UAE's digital economy"
-      },
-      "ecommerce_market_size": {
-        "metric": "E-commerce Market Size",
-        "value": "$27.2B",
-        "source": "Statista 2024",
-        "trend": "up",
-        "description": "Total e-commerce market value in UAE"
-      }
-    }
-  },
-  "services": {
-    "web_development": {
-      "name": "Web Development",
-      "description": "Custom web applications, e-commerce platforms, and SaaS solutions",
-      "required_for": ["E-commerce", "SaaS", "Online Platforms", "Web Apps", "Marketplaces"],
-      "sub_services": [
-        {
-          "name": "Frontend Development",
-          "description": "User interface and user experience development",
-          "technologies": ["React", "Vue.js", "Angular", "Next.js", "TypeScript"],
-          "typical_duration": "4-8 weeks",
-          "budget_range": "$8K-50K"
-        },
-        {
-          "name": "Backend Development",
-          "description": "Server-side logic, APIs, and database design",
-          "technologies": ["Node.js", "Python", "PHP", "Java", "PostgreSQL", "MongoDB"],
-          "typical_duration": "6-12 weeks",
-          "budget_range": "$12K-80K"
-        }
-      ]
-    }
-  },
-  "project_phases": {
-    "general": [
+    ],
+    "digital_marketing": [
       {
-        "name": "Discovery & Planning",
-        "duration": "2-3 weeks",
-        "cost": "$5K-15K",
-        "objectives": ["Market research", "Requirements gathering", "Project planning"],
-        "deliverables": ["Project brief", "Technical specifications", "Timeline"],
-        "description": "Initial phase to understand requirements and plan the project"
-      },
-      {
-        "name": "Design & Prototyping",
-        "duration": "3-4 weeks",
-        "cost": "$10K-25K",
-        "objectives": ["UI/UX design", "Wireframing", "Prototyping"],
-        "deliverables": ["Design mockups", "Interactive prototypes", "Design system"],
-        "description": "Create visual designs and interactive prototypes"
+        "id": "dm001",
+        "name": "GrowthHackers ME",
+        "match_score": 92,
+        "specialization": "Digital Marketing & SEO",
+        "strengths": ["SEO", "Social Media", "Content Marketing"],
+        "portfolio_highlights": ["Tech Startup Launch", "E-commerce Growth"],
+        "location": "Dubai, UAE",
+        "availability": "Available"
       }
     ]
   },
   "competitors": {
-    "ecommerce": [
+    "cafe": [
       {
-        "name": "Amazon",
-        "website": "https://amazon.com",
+        "name": "Starbucks",
         "type": "Inspirational",
-        "summary": "Global e-commerce giant with advanced logistics and AI-powered recommendations",
-        "strengths": ["Massive scale", "Advanced logistics", "AI recommendations", "Prime membership"],
-        "weaknesses": ["Complex seller ecosystem", "High competition", "Limited personalization"],
-        "market_position": "Market leader",
-        "target_audience": "Mass market consumers",
-        "revenue_model": "Commission-based, subscription (Prime)"
+        "website": "starbucks.com",
+        "summary": "Global coffee chain with strong brand and digital presence"
+      },
+      {
+        "name": "Local Cafe Chain",
+        "type": "Direct",
+        "website": "example.com",
+        "summary": "Regional player with local market knowledge"
+      }
+    ]
+  },
+  "articles": {
+    "web_development": [
+      {
+        "title": "Building Your Digital Presence",
+        "type": "guide",
+        "content_url": "/knowledge/web-development-guide",
+        "language": ["en", "ar"]
+      }
+    ]
+  },
+  "vendors": {
+    "cafe": [
+      {
+        "name": "Coffee Suppliers Co.",
+        "type": "Supplier",
+        "service": "Coffee beans and equipment",
+        "external": true
       }
     ]
   }
