@@ -11,17 +11,11 @@ class BlueprintEngine:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
         self.model = genai.GenerativeModel('gemini-1.5-pro')
         
-        # Initialize ChromaDB with settings
-        settings = chromadb.Settings(
-            chroma_api_impl="rest",
-            chroma_server_host=os.getenv("CHROMA_HOST", "topsdraw-blueprint-chromadb"),
-            chroma_server_http_port=int(os.getenv("CHROMA_PORT", "8000")),
-            tenant_id="default_tenant",
-            database_id="default_database"
+        # Initialize ChromaDB with correct settings
+        self.chroma_client = chromadb.HttpClient(
+            host=os.getenv("CHROMA_HOST", "topsdraw-blueprint-chromadb"),
+            port=int(os.getenv("CHROMA_PORT", "8000"))
         )
-        
-        # Initialize client with settings
-        self.chroma_client = chromadb.Client(settings)
         
         # Create embedding function
         self.embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -62,51 +56,97 @@ class BlueprintEngine:
     def load_industry_data(self):
         """Load industry data into ChromaDB"""
         try:
-            with open('../data/knowledge_base.json', 'r') as f:
-                knowledge_base = json.load(f)
-                
-            # Clear existing data
-            self.knowledge_collection.delete(where={})
-            
-            # Add new data
-            for entry in knowledge_base:
-                self.knowledge_collection.add(
-                    documents=[entry['content']],
-                    metadatas=[{
-                        "industry": entry.get('industry', ''),
-                        "type": entry.get('type', ''),
-                        "tags": entry.get('tags', [])
-                    }],
-                    ids=[f"k_{datetime.now().timestamp()}"]
-                )
+            with open('/app/data/knowledge_base.json', 'r') as f:
+                self.knowledge_base = json.load(f)
         except Exception as e:
             print(f"Error loading industry data: {e}")
+            self.knowledge_base = {}
     
     async def generate_blueprint(self, project_idea: str, context: Dict) -> Dict:
         """Generate comprehensive AI-powered blueprint"""
-        
-        # Search for similar blueprints for better context
-        similar_blueprints = self._find_similar_blueprints(project_idea)
-        
-        # Build sophisticated prompt with context from similar blueprints
-        prompt = self._build_creative_prompt(project_idea, context, similar_blueprints)
-        
-        # Generate with Gemini
-        response = self.model.generate_content(prompt)
-        
-        # Parse and structure response
-        blueprint = self._parse_ai_response(response.text)
-        
-        # Add creative touches and regional insights
-        blueprint = self._add_creative_elements(blueprint, context)
-        
-        # Calculate realistic timelines and budgets
-        blueprint = self._calculate_estimates(blueprint, context)
-        
-        # Store blueprint in ChromaDB for future learning
-        self._store_blueprint(blueprint, project_idea, context)
-        
-        return blueprint
+        try:
+            print("\n=== Starting Blueprint Generation ===")
+            print(f"Project Idea: {project_idea}")
+            print(f"Context: {context}")
+            
+            # Search for similar blueprints for better context
+            print("\n1. Finding Similar Blueprints...")
+            similar_blueprints = self._find_similar_blueprints(project_idea)
+            print(f"Found {len(similar_blueprints)} similar blueprints")
+            
+            # Build sophisticated prompt with context from similar blueprints
+            print("\n2. Building AI Prompt...")
+            prompt = self._build_creative_prompt(project_idea, context, similar_blueprints)
+            print(f"Prompt Preview: {prompt[:300]}...")
+            
+            # Generate with Gemini
+            print("\n3. Generating Content with Gemini...")
+            try:
+                print("API Key:", "*" * len(os.getenv("GEMINI_API_KEY", "")))
+                print("Model:", self.model._model_id)
+                response = self.model.generate_content(prompt)
+                print("Response received from Gemini")
+                print(f"Response type: {type(response)}")
+                print(f"Response preview: {str(response)[:300] if response else 'None'}")
+                
+                if not response:
+                    raise ValueError("Received null response from AI model")
+                if not hasattr(response, 'text'):
+                    raise ValueError(f"Response missing text attribute. Response type: {type(response)}")
+                if not response.text:
+                    raise ValueError("Response text is empty")
+                    
+            except Exception as e:
+                print(f"Gemini API error details: {str(e)}")
+                print(f"Error type: {type(e)}")
+                raise ValueError(f"AI generation error: {str(e)}")
+            
+            # Parse and structure response
+            print("\n4. Parsing AI Response...")
+            try:
+                blueprint = self._parse_ai_response(response.text)
+                print(f"Parsed blueprint type: {type(blueprint)}")
+                print(f"Blueprint keys: {blueprint.keys() if isinstance(blueprint, dict) else 'Not a dict'}")
+                
+                if not blueprint:
+                    raise ValueError("Parsed blueprint is empty")
+                if not isinstance(blueprint, dict):
+                    raise ValueError(f"Expected dict, got {type(blueprint)}")
+            except Exception as e:
+                print(f"Parse error details: {str(e)}")
+                raise ValueError(f"Failed to parse AI response: {str(e)}")
+            
+            # Add creative touches and regional insights
+            print("\n5. Adding Creative Elements...")
+            blueprint = self._add_creative_elements(blueprint, context)
+            
+            # Calculate realistic timelines and budgets
+            print("\n6. Calculating Estimates...")
+            blueprint = self._calculate_estimates(blueprint, context)
+            
+            # Store blueprint in ChromaDB for future learning
+            print("\n7. Storing Blueprint...")
+            try:
+                self._store_blueprint(blueprint, project_idea, context)
+                print("Blueprint stored successfully")
+            except Exception as e:
+                print(f"Warning: Failed to store blueprint in ChromaDB: {e}")
+            
+            print("\n=== Blueprint Generation Complete ===")
+            return blueprint
+            
+        except Exception as e:
+            error_msg = str(e)
+            print(f"\n!!! Blueprint Generation Failed !!!")
+            print(f"Error: {error_msg}")
+            print(f"Error type: {type(e)}")
+            
+            if "AI generation error" in error_msg:
+                raise ValueError("Our AI system is currently experiencing issues. Please try again in a few minutes.")
+            elif "Invalid blueprint format" in error_msg:
+                raise ValueError("Failed to create a valid blueprint. Please try with a more detailed project description.")
+            else:
+                raise ValueError(f"Blueprint generation failed: {error_msg}")
     
     def _find_similar_blueprints(self, project_idea: str, limit: int = 3) -> List[Dict]:
         """Find similar blueprints from ChromaDB"""

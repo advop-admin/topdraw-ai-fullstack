@@ -21,7 +21,7 @@ class DataService:
         self._populate_chromadb()
     
     def _populate_chromadb(self):
-        """Populate ChromaDB with agency and competitor data"""
+        """Initialize ChromaDB collections"""
         try:
             # Get or create collections
             from chromadb.utils import embedding_functions
@@ -32,30 +32,8 @@ class DataService:
                 embedding_function=embedder
             )
             
-            # Check if already populated
-            if self.agencies_collection.count() > 0:
-                return
-            
-            # Populate agencies
-            for service_type, agencies in self.agencies.items():
-                for agency in agencies:
-                    doc = f"""
-                    Agency: {agency['name']}
-                    Specialization: {agency.get('specialization', '')}
-                    Location: {agency.get('location', '')}
-                    Strengths: {', '.join(agency.get('strengths', []))}
-                    Portfolio: {', '.join(agency.get('portfolio_highlights', []))}
-                    Service Type: {service_type}
-                    """
-                    
-                    self.agencies_collection.add(
-                        documents=[doc],
-                        metadatas=[{**agency, "service_type": service_type}],
-                        ids=[agency['id']]
-                    )
-            
         except Exception as e:
-            print(f"Error populating ChromaDB: {e}")
+            print(f"Error initializing ChromaDB: {e}")
     
     async def enrich_blueprint(self, blueprint: Dict) -> Dict:
         """Enrich blueprint with agency and competitor data"""
@@ -113,4 +91,56 @@ class DataService:
             # Fallback to original method
             return self.get_top_agencies({"id": service}, blueprint)
     
-    # Rest of the methods remain the same...
+    def load_data(self):
+        """Load agency and competitor data from JSON files"""
+        try:
+            with open('/app/data/agencies.json', 'r') as f:
+                agencies_data = json.load(f)
+                self.agencies = agencies_data.get('agencies', {})
+                
+            with open('/app/data/competitors.json', 'r') as f:
+                competitors_data = json.load(f)
+                self.competitors = competitors_data.get('competitors', [])
+                
+            with open('/app/data/knowledge_base.json', 'r') as f:
+                kb_data = json.load(f)
+                self.knowledge_base = kb_data
+                
+        except Exception as e:
+            print(f"Error loading data: {e}")
+            # Initialize with empty data
+            self.agencies = {}
+            self.competitors = []
+            self.knowledge_base = {}
+
+    def _detect_industry(self, blueprint: Dict) -> str:
+        """Detect industry from blueprint content"""
+        # Simple implementation - can be enhanced
+        return blueprint.get('executive_summary', {}).get('category', 'general')
+
+    def get_competitors(self, industry: str) -> List[Dict]:
+        """Get competitors for the industry"""
+        # Get competitors for the industry from knowledge base
+        industry_competitors = self.knowledge_base.get('competitors', {}).get(industry.lower(), [])
+        return industry_competitors[:3] if industry_competitors else []
+
+    def get_external_vendors(self, industry: str) -> List[Dict]:
+        """Get external vendors for the industry"""
+        vendors = self.knowledge_base.get('vendors', {}).get(industry.lower(), [])
+        return vendors[:3] if vendors else []
+
+    def _generate_why_choose(self, agency: Dict, blueprint: Dict) -> str:
+        """Generate why choose this agency text"""
+        return f"Specializes in {agency.get('specialization', 'digital solutions')} with proven experience in {blueprint.get('project_name', 'similar projects')}"
+
+    def get_top_agencies(self, service: Dict, blueprint: Dict) -> List[Dict]:
+        """Fallback method to get top agencies"""
+        service_id = service.get('id', '')
+        agencies = self.agencies.get(service_id, [])
+        
+        # Simple scoring
+        for agency in agencies:
+            agency['match_fit_score'] = random.randint(80, 95)
+            agency['why_choose'] = self._generate_why_choose(agency, blueprint)
+        
+        return sorted(agencies, key=lambda x: x['match_fit_score'], reverse=True)[:3]

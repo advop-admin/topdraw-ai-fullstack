@@ -482,17 +482,20 @@
                     body: JSON.stringify(formData)
                 });
                 
-                if (!response.ok) throw new Error('Failed to generate blueprint');
+                const data = await response.json();
                 
-                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to generate blueprint');
+                }
                 
                 // Redirect to blueprint display page
-                localStorage.setItem('blueprintData', JSON.stringify(result));
-                window.location.href = `/blueprint.html?id=${result.blueprint_id}`;
+                localStorage.setItem('blueprintData', JSON.stringify(data));
+                window.location.href = `/blueprint.html?id=${data.blueprint_id}`;
                 
             } catch (error) {
-                alert('Error generating blueprint. Please try again.');
-                console.error(error);
+                const errorMessage = error.message || 'Error generating blueprint. Please try again.';
+                alert(errorMessage);
+                console.error('Blueprint generation error:', error);
             } finally {
                 document.getElementById('loadingOverlay').classList.add('hidden');
             }
