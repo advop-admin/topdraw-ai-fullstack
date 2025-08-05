@@ -1,58 +1,47 @@
-version: '3.8'
-
 services:
-  topsdraw-blueprint-backend:
+  backend:
     build: ./backend
-    container_name: topsdraw_blueprint_backend
     ports:
-      - "8000:8000"
+      - "8003:8000"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - CHROMA_HOST=topsdraw-blueprint-chromadb
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/topsdraw_db
+      - CHROMA_HOST=chroma
       - CHROMA_PORT=8000
-      - PYTHONUNBUFFERED=1
+    depends_on:
+      db:
+        condition: service_healthy
+      chroma:
+        condition: service_started
     volumes:
       - ./backend:/app
-      - ./data:/app/data
-    depends_on:
-      - topsdraw-blueprint-chromadb
-    networks:
-      - topsdraw-blueprint-network
-    restart: unless-stopped
 
-  topsdraw-blueprint-chromadb:
-    image: ghcr.io/chroma-core/chroma:latest
-    container_name: topsdraw_blueprint_chromadb
+  frontend:
+    build: ./frontend
     ports:
-      - "8001:8000"
+      - "3001:80"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=topsdraw_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
     volumes:
       - chroma_data:/chroma/chroma
-    environment:
-      - CHROMA_SERVER_HOST=0.0.0.0
-      - CHROMA_SERVER_HTTP_PORT=8000
-      - ANONYMIZED_TELEMETRY=False
-    networks:
-      - topsdraw-blueprint-network
-    restart: unless-stopped
-
-  topsdraw-blueprint-frontend:
-    build: ./frontend
-    container_name: topsdraw_blueprint_frontend
-    ports:
-      - "3000:80"
-    volumes:
-      - ./frontend:/usr/share/nginx/html
-    depends_on:
-      - topsdraw-blueprint-backend
-    networks:
-      - topsdraw-blueprint-network
-    restart: unless-stopped
 
 volumes:
+  postgres_data:
   chroma_data:
-    name: topsdraw_blueprint_chroma_data
-
-networks:
-  topsdraw-blueprint-network:
-    driver: bridge
-    name: topsdraw_blueprint_network
