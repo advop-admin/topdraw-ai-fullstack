@@ -58,8 +58,14 @@ mkdir -p $INSTALL_DIR
 cd $INSTALL_DIR
 
 # Clone repository
-show_progress "Cloning repository"
-git clone https://github.com/advop-admin/topdraw-ai-fullstack.git .
+show_progress "Setting up repository"
+if [ "$(ls -A $INSTALL_DIR)" ]; then
+    # Directory exists and is not empty
+    cd $INSTALL_DIR
+    git pull origin main
+else
+    git clone https://github.com/advop-admin/topdraw-ai-fullstack.git .
+fi
 
 # Setup environment file
 show_progress "Setting up environment configuration"
@@ -75,12 +81,26 @@ EOL
 
 # Setup user permissions
 show_progress "Setting up permissions"
-usermod -aG docker $SUDO_USER
-chown -R $SUDO_USER:$SUDO_USER $INSTALL_DIR
+ACTUAL_USER=$(who am i | awk '{print $1}')
+usermod -aG docker $ACTUAL_USER
+chown -R $ACTUAL_USER:$ACTUAL_USER $INSTALL_DIR
 
 # Start services
 show_progress "Starting services"
 docker compose up -d
+
+# Print success message with additional instructions
+echo -e "\n${GREEN}✅ Installation completed successfully!${NC}"
+echo -e "\n${YELLOW}Important: Docker permissions have been updated.${NC}"
+echo -e "${YELLOW}Please run these commands to apply changes:${NC}"
+echo -e "1. ${GREEN}newgrp docker${NC}"
+echo -e "2. ${GREEN}cd /opt/topsdraw${NC}"
+echo -e "3. ${GREEN}docker compose ps${NC}"
+
+echo -e "\n${YELLOW}Next steps:${NC}"
+echo -e "1. Set your Gemini API key in ${INSTALL_DIR}/.env"
+echo -e "2. Restart services: cd ${INSTALL_DIR} && docker compose restart"
+echo -e "3. Access the application at http://localhost:3001"
 
 # Print success message
 echo -e "\n${GREEN}✅ Installation completed successfully!${NC}"
