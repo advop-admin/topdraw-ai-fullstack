@@ -1,1 +1,0 @@
-"""Topsdraw Compass Proposal Generator Backend Application""" 

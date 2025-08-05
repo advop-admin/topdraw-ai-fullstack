@@ -3,22 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topsdraw Compass Business Development Tool</title>
+    <title>Topsdraw Compass - Business Blueprint Generator</title>
     <style>
         :root {
-            --topsdraw-compass-blue: #2563eb;
-            --topsdraw-compass-blue-light: #3b82f6;
-            --success-green: #10b981;
-            --warning-orange: #f59e0b;
-            --error-red: #ef4444;
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --success: #10b981;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
             --gray-800: #1f2937;
-            --gray-900: #111827;
         }
 
         * {
@@ -29,946 +22,496 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
             color: var(--gray-800);
-            line-height: 1.6;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
+            padding: 2rem;
         }
 
-        /* Header */
-        .header {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .app-header {
             text-align: center;
-        }
-
-        .header h1 {
-            color: var(--topsdraw-compass-blue);
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: var(--gray-600);
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .header .subtitle {
-            color: var(--gray-500);
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        /* System Status Banner */
-        .system-status {
-            background: white;
-            border-radius: 12px;
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .status-icon {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--success-green);
-        }
-
-        .status-icon.loading {
-            background: var(--warning-orange);
-            animation: pulse 2s infinite;
-        }
-
-        .status-icon.error {
-            background: var(--error-red);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .status-text {
-            font-weight: 600;
-            color: var(--gray-700);
-        }
-
-        .status-subtext {
-            color: var(--gray-500);
-            font-size: 14px;
-            margin-left: auto;
-        }
-
-        /* Tab Navigation */
-        .tab-nav {
-            display: flex;
-            background: white;
-            border-radius: 12px;
-            padding: 8px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 16px 24px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s;
-            color: var(--gray-600);
-        }
-
-        .tab-button.active {
-            background: var(--topsdraw-compass-blue);
             color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            margin-bottom: 3rem;
         }
 
-        .tab-button:hover:not(.active) {
-            background: var(--gray-100);
-            color: var(--gray-800);
+        .app-header h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
         }
 
-        /* Main Content */
-        .tab-content {
-            display: none;
-            flex: 1;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .card {
+        .main-card {
             background: white;
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        .card h3 {
-            color: var(--gray-800);
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
+        .input-section {
+            margin-bottom: 2rem;
         }
 
-        /* Forms */
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--gray-700);
-            font-size: 16px;
+            margin-bottom: 0.5rem;
         }
 
-        .form-group input, .form-group textarea {
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
             width: 100%;
-            padding: 16px 20px;
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s;
-            background: var(--gray-50);
+            padding: 0.75rem;
+            border: 2px solid var(--gray-100);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
         }
 
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: var(--topsdraw-compass-blue);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: var(--primary);
         }
 
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
         }
 
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 32px;
+        .generate-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            min-height: 56px;
+            width: 100%;
+            transition: transform 0.3s;
         }
 
-        .btn-primary {
-            background: var(--topsdraw-compass-blue);
-            color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: var(--topsdraw-compass-blue-light);
+        .generate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
         }
 
-        .btn-secondary {
-            background: var(--gray-200);
-            color: var(--gray-700);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-300);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
+        .generate-btn:disabled {
+            opacity: 0.7;
             cursor: not-allowed;
-            transform: none !important;
         }
 
-        /* Loading Spinner */
+        .results-section {
+            display: none;
+        }
+
+        .phase-card {
+            background: var(--gray-50);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card {
+            border: 2px solid var(--gray-100);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agency-card {
+            background: white;
+            border: 1px solid var(--gray-100);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .competitor-card {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .language-toggle button {
+            padding: 0.5rem 1rem;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* RTL Support */
+        html[dir="rtl"] {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .language-toggle {
+            left: 1rem;
+            right: auto;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
         .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid var(--gray-100);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Results Display */
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
-            margin-top: 24px;
-        }
-
-        .result-card {
-            background: var(--gray-50);
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.3s;
-        }
-
-        .result-card:hover {
-            border-color: var(--topsdraw-compass-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .result-card h4 {
-            color: var(--gray-800);
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .result-card p {
-            color: var(--gray-600);
-            font-size: 14px;
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-
-        .score-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            background: var(--success-green);
-            color: white;
-        }
-
-        /* Proposal Editor */
-        #proposalEditor {
-            min-height: 500px;
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 24px;
-            font-family: inherit;
-            line-height: 1.7;
-            background: var(--gray-50);
-            transition: all 0.3s;
-        }
-
-        #proposalEditor:focus {
-            outline: none;
-            border-color: var(--topsdraw-compass-blue);
-            background: white;
-        }
-
-        /* Alert Messages */
-        .alert {
-            padding: 16px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-weight: 500;
-            border: 1px solid;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--success-green);
-            color: #047857;
-        }
-
-        .alert-error {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: var(--error-red);
-            color: #dc2626;
-        }
-
-        .alert-info {
-            background: rgba(37, 99, 235, 0.1);
-            border-color: var(--topsdraw-compass-blue);
-            color: #1d4ed8;
-        }
-
-        /* Loading States */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-
-        .loading-content {
-            text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--gray-200);
-            border-top-color: var(--topsdraw-compass-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        /* Offline Message */
-        .offline-banner {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border: 1px solid #f87171;
-            color: #991b1b;
-            padding: 16px 24px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* Hidden class */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 12px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .card {
-                padding: 24px;
-            }
-
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
+    <div class="language-toggle">
+        <button onclick="toggleLanguage()">العربية</button>
+    </div>
+
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>Topsdraw Compass Business Development Tool</h1>
-            <p>AI-Powered Client Analysis & Proposal Generation</p>
-            <div class="subtitle">Professional tools for intelligent business development</div>
+        <div class="app-header">
+            <h1>🧭 Topsdraw Compass</h1>
+            <p>Transform your business idea into a detailed action plan</p>
         </div>
 
-        <!-- System Status (Hidden when working) -->
-        <div id="systemStatus" class="system-status hidden">
-            <div class="status-icon" id="statusIcon"></div>
-            <div class="status-text" id="statusText">System Ready</div>
-            <div class="status-subtext" id="statusSubtext"></div>
-        </div>
-
-        <!-- Offline Banner (Hidden by default) -->
-        <div id="offlineBanner" class="offline-banner hidden">
-            🔌 System temporarily unavailable. Please try again in a few moments or contact IT support.
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="tab-nav">
-            <button class="tab-button active" onclick="switchTab('client-analysis')">
-                📊 Client Analysis
-            </button>
-            <button class="tab-button" onclick="switchTab('proposal-generation')">
-                📝 Proposal Generation
-            </button>
-        </div>
-
-        <!-- Client Analysis Tab -->
-        <div id="client-analysis" class="tab-content active">
-            <div class="card">
-                <h3>Client Analysis</h3>
-                <p style="color: var(--gray-600); margin-bottom: 24px;">
-                    Enter client information to analyze their business profile and find relevant Topsdraw Compass project experience.
-                </p>
+        <div class="main-card">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2>Tell us about your business idea</h2>
                 
-                <form id="clientForm">
-                    <div class="form-group">
-                        <label for="clientName">Client Company Name *</label>
-                        <input type="text" id="clientName" required placeholder="e.g., Apollo Hospitals, Infosys, Amazon">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="clientWebsite">Company Website *</label>
-                        <input type="url" id="clientWebsite" required placeholder="https://company.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="socialUrls">LinkedIn/Social Media URLs (Optional)</label>
-                        <textarea id="socialUrls" placeholder="Enter LinkedIn company page, Twitter, or other social media URLs (one per line)"></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary" id="analyzeBtn">
-                        <span class="btn-text">🔍 Analyze Client</span>
-                        <span class="spinner hidden"></span>
-                    </button>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label for="businessIdea">What's your business idea? *</label>
+                    <textarea id="businessIdea" rows="3" placeholder="e.g., I want to start a cafe that combines coffee with co-working spaces..." required></textarea>
+                </div>
 
-            <!-- Analysis Results -->
-            <div id="analysisResults" class="card hidden">
-                <h3>Analysis Results</h3>
-                <div id="clientData"></div>
-                <div id="matchedProjects"></div>
-                <button class="btn btn-primary" onclick="proceedToProposal()">
-                    📝 Generate Proposal
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <select id="industry">
+                            <option value="">Select Industry</option>
+                            <option value="cafe">Food & Beverage</option>
+                            <option value="tech">Technology</option>
+                            <option value="retail">Retail</option>
+                            <option value="service">Services</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" placeholder="e.g., Dubai, UAE">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget">Budget Range</label>
+                        <select id="budget">
+                            <option value="">Select Budget</option>
+                            <option value="<50k">Less than $50k</option>
+                            <option value="50k-100k">$50k - $100k</option>
+                            <option value="100k-500k">$100k - $500k</option>
+                            <option value=">500k">More than $500k</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeline">Timeline</label>
+                        <select id="timeline">
+                            <option value="">Select Timeline</option>
+                            <option value="3months">3 months</option>
+                            <option value="6months">6 months</option>
+                            <option value="1year">1 year</option>
+                            <option value=">1year">More than 1 year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="generate-btn" onclick="generateBlueprint()">
+                    Generate Business Blueprint
                 </button>
             </div>
-        </div>
 
-        <!-- Proposal Generation Tab -->
-        <div id="proposal-generation" class="tab-content">
-            <div class="card">
-                <h3>Proposal Generation</h3>
-                <p style="color: var(--gray-600); margin-bottom: 24px;">
-                    Generate a customized proposal based on client analysis and Topsdraw Compass's relevant project experience.
-                </p>
-                
-                <div id="proposalForm">
-                    <div class="form-group">
-                        <label for="customRequirements">Additional Requirements (Optional)</label>
-                        <textarea id="customRequirements" placeholder="Any specific requirements, technologies, or focus areas for this proposal..."></textarea>
-                    </div>
-                    
-                    <button class="btn btn-primary" id="generateBtn" onclick="generateProposal()">
-                        <span class="btn-text">✨ Generate Proposal</span>
-                        <span class="spinner hidden"></span>
-                    </button>
-                </div>
+            <!-- Loading State -->
+            <div class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem;">Creating your personalized blueprint...</p>
             </div>
 
-            <!-- Proposal Editor -->
-            <div id="proposalContainer" class="card hidden">
-                <h3>Generated Proposal</h3>
-                <div id="proposalMeta"></div>
-                <div contenteditable="true" id="proposalEditor" placeholder="Your AI-generated proposal will appear here..."></div>
-                
-                <div style="margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap;">
-                    <button class="btn btn-primary" onclick="exportProposal('copy')">
-                        📋 Copy to Clipboard
-                    </button>
-                    <button class="btn btn-secondary" onclick="exportProposal('download')">
-                        💾 Download as Document
-                    </button>
-                    <button class="btn btn-secondary" onclick="regenerateSection()">
-                        🔄 Regenerate Section
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="loading-overlay hidden">
-            <div class="loading-content">
-                <div class="loading-spinner"></div>
-                <h3 style="margin-bottom: 8px;">Processing...</h3>
-                <p id="loadingText">Analyzing client information with AI</p>
+            <!-- Results Section -->
+            <div class="results-section" id="results">
+                <!-- Results will be dynamically populated here -->
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:8000';
-        
-        // Global state
-        let analysisData = null;
-        let systemInitialized = false;
+        const API_URL = 'http://localhost:8000/api';
+        let currentLanguage = 'en';
+        let blueprintData = null;
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeSystem();
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            document.documentElement.setAttribute('dir', currentLanguage === 'ar' ? 'rtl' : 'ltr');
+            document.querySelector('.language-toggle button').textContent = currentLanguage === 'en' ? 'العربية' : 'English';
             
-            // Set up form submission
-            document.getElementById('clientForm').addEventListener('submit', handleClientAnalysis);
-            
-            // Check system status every 30 seconds
-            setInterval(checkSystemHealth, 30000);
-        });
+            // Update UI text based on language
+            updateUILanguage();
+        }
 
-        // System Initialization - Silent for Business Users
-        async function initializeSystem() {
-            try {
-                // Silent background checks
-                const [health, stats] = await Promise.all([
-                    apiCall('/api/health'),
-                    apiCall('/api/chroma-stats')
-                ]);
-                
-                const projectCount = stats.document_count || 0;
-                
-                if (projectCount > 0) {
-                    // System is ready - hide any status banners
-                    hideSystemStatus();
-                    systemInitialized = true;
-                } else {
-                    // Try to initialize silently
-                    await silentSystemInit();
+        function updateUILanguage() {
+            const translations = {
+                en: {
+                    title: "Topsdraw Compass",
+                    subtitle: "Transform your business idea into a detailed action plan",
+                    ideaLabel: "What's your business idea?",
+                    generateBtn: "Generate Business Blueprint"
+                },
+                ar: {
+                    title: "بوصلة توبسدرو",
+                    subtitle: "حول فكرة عملك إلى خطة عمل مفصلة",
+                    ideaLabel: "ما هي فكرة عملك؟",
+                    generateBtn: "إنشاء مخطط الأعمال"
                 }
-                
-            } catch (error) {
-                // Show offline banner only if system is completely unavailable
-                showOfflineBanner();
-            }
-        }
-
-        // Silent system initialization
-        async function silentSystemInit() {
-            try {
-                // Try to trigger initialization without exposing technical details
-                await apiCall('/api/trigger-vectorization', 'POST');
-                
-                // Wait and check if it worked
-                setTimeout(async () => {
-                    try {
-                        const stats = await apiCall('/api/chroma-stats');
-                        if (stats.document_count > 0) {
-                            hideSystemStatus();
-                            systemInitialized = true;
-                        } else {
-                            // If still no projects, show loading state
-                            showSystemLoading();
-                        }
-                    } catch (error) {
-                        showOfflineBanner();
-                    }
-                }, 10000);
-                
-            } catch (error) {
-                showSystemLoading();
-            }
-        }
-
-        // System status management (minimal exposure)
-        function showSystemLoading() {
-            const statusDiv = document.getElementById('systemStatus');
-            const icon = document.getElementById('statusIcon');
-            const text = document.getElementById('statusText');
-            const subtext = document.getElementById('statusSubtext');
-            
-            icon.className = 'status-icon loading';
-            text.textContent = 'System Initializing...';
-            subtext.textContent = 'Please wait a moment';
-            statusDiv.classList.remove('hidden');
-        }
-
-        function hideSystemStatus() {
-            document.getElementById('systemStatus').classList.add('hidden');
-            document.getElementById('offlineBanner').classList.add('hidden');
-        }
-
-        function showOfflineBanner() {
-            document.getElementById('offlineBanner').classList.remove('hidden');
-            document.getElementById('systemStatus').classList.add('hidden');
-        }
-
-        // Health check (silent)
-        async function checkSystemHealth() {
-            try {
-                const stats = await apiCall('/api/chroma-stats');
-                if (stats.document_count > 0 && !systemInitialized) {
-                    hideSystemStatus();
-                    systemInitialized = true;
-                }
-            } catch (error) {
-                // Only show offline banner if system becomes unavailable
-                if (systemInitialized) {
-                    showOfflineBanner();
-                }
-            }
-        }
-
-        // Tab switching
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-        }
-
-        // API Helper function
-        async function apiCall(endpoint, method = 'GET', data = null) {
-            const options = {
-                method,
-                headers: { 'Content-Type': 'application/json' }
             };
-            
-            if (data) {
-                if (data instanceof FormData) {
-                    delete options.headers['Content-Type'];
-                    options.body = data;
-                } else {
-                    options.body = JSON.stringify(data);
-                }
-            }
-            
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-            if (!response.ok) {
-                throw new Error(`Service temporarily unavailable`);
-            }
-            return await response.json();
+
+            const t = translations[currentLanguage];
+            document.querySelector('.app-header h1').textContent = t.title;
+            document.querySelector('.app-header p').textContent = t.subtitle;
+            document.querySelector('label[for="businessIdea"]').textContent = t.ideaLabel + ' *';
+            document.querySelector('.generate-btn').textContent = t.generateBtn;
         }
 
-        // Client Analysis
-        async function handleClientAnalysis(event) {
-            event.preventDefault();
+        async function generateBlueprint() {
+            const businessIdea = document.getElementById('businessIdea').value.trim();
             
-            const analyzeBtn = document.getElementById('analyzeBtn');
-            const btnText = analyzeBtn.querySelector('.btn-text');
-            const spinner = analyzeBtn.querySelector('.spinner');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const loadingText = document.getElementById('loadingText');
-            
-            // Show professional loading state
-            analyzeBtn.disabled = true;
-            btnText.textContent = '🔍 Analyzing...';
-            spinner.classList.remove('hidden');
-            loadingOverlay.classList.remove('hidden');
-            loadingText.textContent = 'Analyzing client website and business profile...';
-            
+            if (!businessIdea) {
+                alert('Please enter your business idea');
+                return;
+            }
+
+            // Show loading
+            document.querySelector('.loading').style.display = 'block';
+            document.querySelector('.generate-btn').disabled = true;
+            document.querySelector('.results-section').style.display = 'none';
+
             try {
-                // Prepare form data
-                const formData = new FormData();
-                formData.append('name', document.getElementById('clientName').value);
-                formData.append('website', document.getElementById('clientWebsite').value);
-               
-               const socialUrls = document.getElementById('socialUrls').value
-                   .split('\n')
-                   .filter(url => url.trim())
-                   .map(url => url.trim());
-               formData.append('social_urls', JSON.stringify(socialUrls));
-               
-               // Update loading text
-               loadingText.textContent = 'Finding similar Topsdraw Compass projects...';
-               
-               // Make API call
-               const result = await apiCall('/api/analyze-client', 'POST', formData);
-               
-               // Store for proposal generation
-               analysisData = result;
-               
-               // Update loading text
-               loadingText.textContent = 'Preparing analysis results...';
-               
-               // Small delay for smooth UX
-               await new Promise(resolve => setTimeout(resolve, 1000));
-               
-               // Display results
-               displayAnalysisResults(result);
-               
-               showAlert('✅ Client analysis completed successfully! Found relevant project matches.', 'success');
-               
-           } catch (error) {
-               showAlert('❌ Unable to analyze client at this time. Please check the website URL and try again.', 'error');
-           } finally {
-               // Reset button state
-               analyzeBtn.disabled = false;
-               btnText.textContent = '🔍 Analyze Client';
-               spinner.classList.add('hidden');
-               loadingOverlay.classList.add('hidden');
-           }
-       }
+                const response = await fetch(`${API_URL}/generate-blueprint`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        business_idea: businessIdea,
+                        language: currentLanguage,
+                        industry: document.getElementById('industry').value,
+                        location: document.getElementById('location').value,
+                        budget_range: document.getElementById('budget').value,
+                        timeline: document.getElementById('timeline').value
+                    })
+                });
 
-       function displayAnalysisResults(data) {
-           const resultsContainer = document.getElementById('analysisResults');
-           const clientDataContainer = document.getElementById('clientData');
-           const projectsContainer = document.getElementById('matchedProjects');
-           
-           // Display client data with professional formatting
-           const clientData = data.scraped_data;
-           clientDataContainer.innerHTML = `
-               <div class="result-card" style="border: 2px solid var(--topsdraw-compass-blue); background: rgba(37, 99, 235, 0.05);">
-                   <h4>📊 Company Profile</h4>
-                   <p><strong>Industry:</strong> ${clientData.industry || 'Technology/General'}</p>
-                   <p><strong>Company Size:</strong> ${clientData.company_size || 'Not specified'}</p>
-                   <p><strong>Core Services:</strong> ${clientData.services.join(', ') || 'Business services'}</p>
-                   <p><strong>Technology Stack:</strong> ${clientData.tech_stack.join(', ') || 'Various technologies'}</p>
-                   <p><strong>Business Overview:</strong> ${clientData.company_description || 'Professional services company'}</p>
-                   <div class="score-badge">Analysis Confidence: ${Math.round(clientData.confidence_score * 100)}%</div>
-               </div>
-           `;
-           
-           // Display matched projects with business focus
-           if (data.matched_projects && data.matched_projects.length > 0) {
-               projectsContainer.innerHTML = `
-                   <h4 style="margin-top: 24px; color: var(--gray-800);">🎯 Relevant Topsdraw Compass Experience</h4>
-                   <div class="results-grid">
-                       ${data.matched_projects.map(project => `
-                           <div class="result-card">
-                               <h4>${project.project_name}</h4>
-                               <p><strong>Industry:</strong> ${project.industry_vertical}</p>
-                               <p><strong>Client Type:</strong> ${project.client_type}</p>
-                               <p><strong>Project Scope:</strong> ${project.project_description}</p>
-                               <div class="score-badge">Relevance: ${Math.round(project.similarity_score * 100)}%</div>
-                           </div>
-                       `).join('')}
-                   </div>
-               `;
-           } else {
-               projectsContainer.innerHTML = `
-                   <div class="alert alert-info" style="margin-top: 24px;">
-                       <strong>📋 Project Analysis</strong><br>
-                       While we have extensive project experience, no direct matches were found for this specific client profile. 
-                       Our proposal will highlight Topsdraw Compass's broader capabilities and relevant industry experience.
-                   </div>
-               `;
-           }
-           
-           resultsContainer.classList.remove('hidden');
-       }
+                if (!response.ok) throw new Error('Failed to generate blueprint');
 
-       // Proceed to proposal tab
-       function proceedToProposal() {
-           switchTab('proposal-generation');
-           document.querySelectorAll('.tab-button')[1].click();
-       }
+                blueprintData = await response.json();
+                displayResults(blueprintData);
 
-       // Proposal Generation
-       async function generateProposal() {
-           if (!analysisData) {
-               showAlert('❌ Please complete client analysis first before generating a proposal.', 'error');
-               return;
-           }
-           
-           const generateBtn = document.getElementById('generateBtn');
-           const btnText = generateBtn.querySelector('.btn-text');
-           const spinner = generateBtn.querySelector('.spinner');
-           const loadingOverlay = document.getElementById('loadingOverlay');
-           const loadingText = document.getElementById('loadingText');
-           
-           // Show professional loading state
-           generateBtn.disabled = true;
-           btnText.textContent = '✨ Generating...';
-           spinner.classList.remove('hidden');
-           loadingOverlay.classList.remove('hidden');
-           loadingText.textContent = 'Creating customized proposal...';
-           
-           try {
-               const customRequirements = document.getElementById('customRequirements').value;
-               
-               const requestData = {
-                   client_info: {
-                       name: document.getElementById('clientName').value,
-                       website: document.getElementById('clientWebsite').value,
-                       social_urls: []
-                   },
-                   scraped_data: analysisData.scraped_data,
-                   matched_projects: analysisData.matched_projects,
-                   custom_requirements: customRequirements || null
-               };
-               
-               loadingText.textContent = 'Incorporating Topsdraw Compass project experience...';
-               
-               const result = await apiCall('/api/generate-proposal', 'POST', requestData);
-               
-               loadingText.textContent = 'Finalizing proposal document...';
-               
-               // Small delay for smooth UX
-               await new Promise(resolve => setTimeout(resolve, 1500));
-               
-               displayProposal(result);
-               showAlert('✅ Proposal generated successfully! Review and customize as needed.', 'success');
-               
-           } catch (error) {
-               showAlert('❌ Unable to generate proposal at this time. Please try again or contact support.', 'error');
-           } finally {
-               // Reset button state
-               generateBtn.disabled = false;
-               btnText.textContent = '✨ Generate Proposal';
-               spinner.classList.add('hidden');
-               loadingOverlay.classList.add('hidden');
-           }
-       }
+            } catch (error) {
+                alert('Error generating blueprint. Please try again.');
+                console.error(error);
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+                document.querySelector('.generate-btn').disabled = false;
+            }
+        }
 
-       function displayProposal(data) {
-           const container = document.getElementById('proposalContainer');
-           const meta = document.getElementById('proposalMeta');
-           const editor = document.getElementById('proposalEditor');
-           
-           // Display metadata with professional formatting
-           meta.innerHTML = `
-               <div style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--topsdraw-compass-blue);">
-                   <div style="font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">
-                       📄 Proposal Generated Successfully
-                   </div>
-                   <small style="color: var(--gray-600);">
-                       Created: ${new Date(data.generation_timestamp).toLocaleString()} | 
-                       Word Count: ${data.word_count} | 
-                       Processing Time: ${data.processing_time.toFixed(1)}s
-                   </small>
-               </div>
-           `;
-           
-           // Display proposal content with better formatting
-           const formattedContent = data.proposal_content
-               .replace(/\n/g, '<br>')
-               .replace(/#{1,3}\s*([^\n]+)/g, '<h3 style="color: var(--topsdraw-compass-blue); margin: 24px 0 12px 0; font-weight: 700;">$1</h3>')
-               .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-           
-           editor.innerHTML = formattedContent;
-           
-           container.classList.remove('hidden');
-       }
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <h2>${data.project_name}</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 2rem;">${data.executive_summary}</p>
 
-       // Section Regeneration
-       async function regenerateSection() {
-           const sectionName = prompt('Enter the section name you want to regenerate (e.g., "Executive Summary", "Technology Approach"):');
-           if (!sectionName) return;
-           
-           const requirements = prompt('Any specific requirements for this section?') || '';
-           
-           try {
-               const result = await apiCall('/api/regenerate-section', 'POST', {
-                   section_name: sectionName,
-                   context: document.getElementById('proposalEditor').textContent,
-                   requirements: requirements
-               });
-               
-               // Replace the section in the editor
-               const editor = document.getElementById('proposalEditor');
-               const newContent = `\n\n<h3 style="color: var(--topsdraw-compass-blue); margin: 24px 0 12px 0; font-weight: 700;">${result.section_name}</h3>\n${result.section_content}\n\n`;
-               editor.innerHTML += newContent.replace(/\n/g, '<br>');
-               
-               showAlert(`✅ Section "${sectionName}" regenerated successfully!`, 'success');
-               
-           } catch (error) {
-               showAlert(`❌ Unable to regenerate section. Please try again.`, 'error');
-           }
-       }
+                <!-- Overview Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div class="phase-card">
+                        <h4>Target Market</h4>
+                        <p>${data.target_market.primary_audience}</p>
+                        <small>Market Size: ${data.target_market.market_size}</small>
+                    </div>
+                    <div class="phase-card">
+                        <h4>Launch Approach</h4>
+                        <p>${data.launch_approach.type}</p>
+                        <small>${data.launch_approach.rationale}</small>
+                    </div>
+                    <div class="phase-card">
+                        <h4>Timeline & Budget</h4>
+                        <p>${data.timeline_budget.total_duration}</p>
+                        <small>${data.timeline_budget.budget_range}</small>
+                    </div>
+                </div>
 
-       // Export Functions
-       async function exportProposal(type) {
-           const content = document.getElementById('proposalEditor').textContent;
-           
-           if (type === 'copy') {
-               try {
-                   await navigator.clipboard.writeText(content);
-                   showAlert('✅ Proposal copied to clipboard! You can now paste it into any document.', 'success');
-               } catch (error) {
-                   showAlert('❌ Unable to copy to clipboard. Please select and copy the text manually.', 'error');
-               }
-           } else if (type === 'download') {
-               const clientName = document.getElementById('clientName').value || 'Client';
-               const blob = new Blob([content], { type: 'text/plain' });
-               const url = URL.createObjectURL(blob);
-               const a = document.createElement('a');
-               a.href = url;
-               a.download = `Topsdraw_Compass_Proposal_${clientName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
-               document.body.appendChild(a);
-               a.click();
-               document.body.removeChild(a);
-               URL.revokeObjectURL(url);
-               showAlert('✅ Proposal downloaded successfully!', 'success');
-           }
-       }
+                <!-- Action Plan -->
+                <h3>📋 Action Plan</h3>
+                ${data.action_plan.map((phase, index) => `
+                    <div class="phase-card">
+                        <h4>Phase ${index + 1}: ${phase.phase_name}</h4>
+                        <p><strong>Duration:</strong> ${phase.duration} | <strong>Cost:</strong> ${phase.estimated_cost}</p>
+                        <p><strong>Objectives:</strong> ${phase.objectives.join(', ')}</p>
+                        <p><strong>Deliverables:</strong> ${phase.deliverables.join(', ')}</p>
+                        <p><strong>Creative Ideas:</strong> ${phase.creative_ideas.join(', ')}</p>
+                    </div>
+                `).join('')}
 
-       // Alert system
-       function showAlert(message, type) {
-           // Remove existing alerts
-           document.querySelectorAll('.alert').forEach(alert => alert.remove());
-           
-           const alert = document.createElement('div');
-           alert.className = `alert alert-${type}`;
-           alert.textContent = message;
-           
-           // Insert at top of container
-           const container = document.querySelector('.container');
-           container.insertBefore(alert, container.children[1]);
-           
-           // Auto-remove after 5 seconds
-           setTimeout(() => {
-               if (alert.parentNode) {
-                   alert.remove();
-               }
-           }, 5000);
-       }
-   </script>
+                <!-- Required Services -->
+                <h3>🛠️ Required Services</h3>
+                ${data.required_services.map(service => `
+                    <div class="service-card">
+                        <h4>${service.name}</h4>
+                        <p>${service.why_required}</p>
+                        <button class="action-btn" onclick="showAgencies('${service.id}')">View Top Agencies</button>
+                    </div>
+                `).join('')}
+
+                <!-- Agency Recommendations (Hidden by default) -->
+                <div id="agencies-section" style="display: none;">
+                    <h3>🏢 Top Agency Recommendations</h3>
+                    <div id="agencies-content"></div>
+                </div>
+
+                <!-- Competitors -->
+                <h3>👁️ Competitor Watchlist</h3>
+                ${data.competitors.map(comp => `
+                    <div class="competitor-card">
+                        <h4>${comp.name} (${comp.type})</h4>
+                        <p>${comp.summary}</p>
+                        <a href="https://${comp.website}" target="_blank">Visit Website</a>
+                    </div>
+                `).join('')}
+
+                <!-- Action Center -->
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="requestAgencies()">Request Agency Shortlist</button>
+                    <button class="action-btn" onclick="downloadBlueprint()">Download Blueprint (PDF)</button>
+                    <button class="action-btn" onclick="shareBlueprint()">Share with Partners</button>
+                    <button class="action-btn" onclick="bookSession()">Book Concierge Session</button>
+                </div>
+            `;
+
+            resultsDiv.style.display = 'block';
+        }
+
+        function showAgencies(serviceId) {
+            const agencies = blueprintData.agency_recommendations[serviceId];
+            const agenciesContent = document.getElementById('agencies-content');
+            
+            agenciesContent.innerHTML = agencies.map(agency => `
+                <div class="agency-card">
+                    <h4>${agency.name}</h4>
+                    <p><strong>Match Score:</strong> ${agency.match_score}%</p>
+                    <p><strong>Specialization:</strong> ${agency.specialization}</p>
+                    <p><strong>Strengths:</strong> ${agency.strengths.join(', ')}</p>
+                    <p><strong>Location:</strong> ${agency.location}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('agencies-section').style.display = 'block';
+        }
+
+        async function requestAgencies() {
+            const contact = prompt('Enter your email for agency shortlist:');
+            if (!contact) return;
+
+            try {
+                const response = await fetch(`${API_URL}/request-agencies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        service_lines: blueprintData.required_services.map(s => s.id),
+                        contact_info: { email: contact }
+                    })
+                });
+
+                const result = await response.json();
+                alert(`Request submitted! Ticket ID: ${result.ticket_id}`);
+            } catch (error) {
+                alert('Failed to submit request. Please try again.');
+            }
+        }
+
+        function downloadBlueprint() {
+            // In production, this would generate a proper PDF
+            const content = JSON.stringify(blueprintData, null, 2);
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `blueprint-${blueprintData.project_name.replace(/\s+/g, '-')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function shareBlueprint() {
+            const shareUrl = `${window.location.origin}/share/${btoa(JSON.stringify(blueprintData))}`;
+            navigator.clipboard.writeText(shareUrl);
+            alert('Share link copied to clipboard!');
+        }
+
+        function bookSession() {
+            window.open('https://calendly.com/topsdraw-compass', '_blank');
+        }
+    </script>
 </body>
 </html>

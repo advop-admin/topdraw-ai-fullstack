@@ -1,86 +1,18 @@
 version: '3.8'
 
 services:
-  topsdraw-compass-frontend:
-    build: 
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: topsdraw_compass_fullstack_frontend_1
-    image: topsdraw_compass_fullstack_frontend:latest
-    ports:
-      - "3001:3000"
-    environment:
-      - API_BASE_URL=http://localhost:8000/api
-    depends_on:
-      - topsdraw-compass-backend
-    networks:
-      - default
-      - topsdraw-compass-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3000')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  topsdraw-compass-backend:
+  backend:
     build: ./backend
-    container_name: topsdraw_compass_fullstack_backend_1
-    image: topsdraw_compass_fullstack_backend:latest
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
-    env_file:
-      - .env
     environment:
-      - PYTHONPATH=/app
-      - PYTHONUNBUFFERED=1
-    depends_on:
-      - chroma
-      - postgres
-    networks:
-      - default
-      - topsdraw-compass-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - ./data:/app/data
 
-  chroma:
-    image: ghcr.io/chroma-core/chroma:0.5.20
-    container_name: topsdraw_compass_fullstack_chroma_1
+  frontend:
+    image: nginx:alpine
     ports:
-      - "8001:8000"
-    environment:
-      - CHROMA_SERVER_HOST=0.0.0.0
-      - CHROMA_SERVER_HTTP_PORT=8000
-      - ANONYMIZED_TELEMETRY=False
+      - "3000:80"
     volumes:
-      - chroma_data:/chroma/chroma
-    networks:
-      - topsdraw-compass-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-
-
-volumes:
-  chroma_data:
-    driver: local
-    name: topsdraw_compass_fullstack_chroma_data
-
-
-networks:
-  default:
-    external:
-      name: topsdraw-compass-fullstack_default
-  topsdraw-compass-network:
-    driver: bridge
-    name: topsdraw_compass_fullstack_topsdraw-compass-network
+      - ./frontend:/usr/share/nginx/html
