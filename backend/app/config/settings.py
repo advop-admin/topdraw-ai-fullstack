@@ -27,13 +27,7 @@ class Settings(BaseSettings):
     chroma_api_key: Optional[str] = os.getenv("CHROMA_API_KEY")  # Only needed for cloud
     chroma_collection_name: str = "topsdraw_compass_projects"
     
-    # PostgreSQL Configuration - DATABASE_URL approach
-    database_url: Optional[str] = os.getenv("DATABASE_URL")
-    postgres_host: str = os.getenv("POSTGRES_HOST", "localhost")
-    postgres_port: int = int(os.getenv("POSTGRES_PORT", "5432"))
-    postgres_db: str = os.getenv("POSTGRES_DB", "topsdraw_compass_pm")
-    postgres_user: str = os.getenv("POSTGRES_USER", "postgres")
-    postgres_password: str = os.getenv("POSTGRES_PASSWORD", "")
+
     
     # File Upload Configuration
     max_file_size: int = 10 * 1024 * 1024  # 10MB

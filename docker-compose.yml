@@ -38,6 +38,7 @@ services:
       - PYTHONUNBUFFERED=1
     depends_on:
       - chroma
+      - postgres
     networks:
       - default
       - topsdraw-compass-network
@@ -68,10 +69,13 @@ services:
       timeout: 10s
       retries: 3
 
+
+
 volumes:
   chroma_data:
     driver: local
     name: topsdraw_compass_fullstack_chroma_data
+
 
 networks:
   default:

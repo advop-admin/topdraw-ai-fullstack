@@ -37,7 +37,7 @@ class CompassService:
         except Exception as e:
             logger.error(f"Error loading {filename}: {e}")
             return {}
-
+    
     def get_service_recommendations(self, business_idea: str, industry: str = "") -> List[Dict]:
         """Get service recommendations based on business idea and industry"""
         try:
@@ -226,7 +226,7 @@ class CompassService:
         except Exception as e:
             logger.error(f"Error getting agencies by service: {e}")
             return []
-
+        
     def create_agency_shortlist(self, project_details: Dict, service_requirements: List[str]) -> Dict:
         """Create agency shortlist for project"""
         try:

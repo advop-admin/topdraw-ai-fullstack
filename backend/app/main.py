@@ -27,42 +27,7 @@ logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
-async def run_database_migration():
-    """Run database schema migration on startup"""
-    try:
-        logger.info("🔧 Running database schema migration...")
-        
-        migration_script = os.path.join(os.path.dirname(__file__), "..", "scripts", "migrate_projects_schema.py")
-        
-        if not os.path.exists(migration_script):
-            logger.warning(f"Migration script not found at {migration_script}")
-            return False
-        
-        result = subprocess.run(
-            [sys.executable, migration_script], 
-            capture_output=True, 
-            text=True,
-            cwd=os.path.dirname(migration_script),
-            timeout=60  # 1 minute timeout for migration
-        )
-        
-        if result.returncode == 0:
-            logger.info("✅ Database migration completed successfully")
-            if result.stdout:
-                logger.info(f"Migration output: {result.stdout.strip()}")
-            return True
-        else:
-            logger.error(f"❌ Database migration failed with return code {result.returncode}")
-            if result.stderr:
-                logger.error(f"Migration error: {result.stderr.strip()}")
-            return False
-            
-    except subprocess.TimeoutExpired:
-        logger.error("❌ Database migration timed out after 60 seconds")
-        return False
-    except Exception as e:
-        logger.error(f"❌ Unexpected error during database migration: {e}")
-        return False
+
 
 async def run_startup_vectorization():
     """Run automatic project vectorization on startup"""
@@ -159,13 +124,7 @@ async def lifespan(app: FastAPI):
     """Enhanced application lifespan manager with auto-migration and vectorization"""
     logger.info("🚀 Starting Topsdraw Compass Proposal Generator API...")
     
-    # Step 1: Run database migration
-    logger.info("📋 Step 1: Database Migration")
-    migration_success = await run_database_migration()
-    if not migration_success:
-        logger.warning("⚠️ Database migration failed - some features may not work correctly")
-    
-    # Step 2: Initialize services
+    # Step 1: Initialize services
     logger.info("📋 Step 2: Service Initialization")
     try:
         gemini_service, chroma_service, compass_service = await initialize_services()
@@ -262,11 +221,9 @@ async def health_check():
             "message": startup_message
         },
         "features": {
-            "auto_migration": True,
             "auto_vectorization": True,
             "gemini_ai": True,
-            "chromadb": True,
-            "postgresql": True
+            "chromadb": True
         }
     }
 
@@ -292,7 +249,7 @@ async def root():
         "message": "Welcome to Topsdraw Compass Proposal Generator API v2.0",
         "version": "2.0.0",
         "features": [
-            "Automatic database migration on startup",
+
             "Automatic project vectorization on startup", 
             "AI client analysis with Gemini",
             "Semantic project matching with ChromaDB",
