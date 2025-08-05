@@ -7,7 +7,7 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/topsdraw_db
       - CHROMA_HOST=chroma
-      - CHROMA_PORT=8000
+      - CHROMA_PORT=8000  # This is the internal port
     depends_on:
       db:
         condition: service_healthy
@@ -39,6 +39,8 @@ services:
 
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
+    ports:
+      - "8004:8000"  # Changed external port to 8004
     volumes:
       - chroma_data:/chroma/chroma
 

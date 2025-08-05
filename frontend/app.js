@@ -1,5 +1,5 @@
-// API Configuration
-const API_BASE_URL = '/api';  // Changed to use relative path
+// API Configuration - FIXED to use backend port directly
+const API_BASE_URL = 'http://localhost:8003/api';  // Points to backend port
 
 // State
 let currentLanguage = 'en';
@@ -8,7 +8,21 @@ let generatedBlueprint = null;
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
+    checkBackendHealth();
 });
+
+// Check backend health on load
+async function checkBackendHealth() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/health`);
+        if (!response.ok) {
+            console.warn('Backend health check failed');
+        }
+    } catch (error) {
+        console.error('Backend not available:', error);
+        showError('Backend service is not available. Please ensure the server is running.');
+    }
+}
 
 function initializeEventListeners() {
     // Form submission
@@ -24,7 +38,15 @@ async function handleFormSubmit(e) {
     e.preventDefault();
     
     const formData = new FormData(e.target);
-    formData.append('preferred_language', currentLanguage === 'ar' ? 'Arabic' : 'English');
+    
+    // Fix: Get the form values correctly
+    formData.set('description', document.getElementById('description').value);
+    formData.set('business_type', document.getElementById('businessType').value || '');
+    formData.set('launch_location', document.getElementById('location').value || 'UAE');
+    formData.set('budget', document.getElementById('budget').value || '');
+    formData.set('timeline', document.getElementById('timeline').value || '');
+    formData.set('involvement_preference', document.querySelector('input[name="involvement"]:checked').value);
+    formData.set('preferred_language', currentLanguage === 'ar' ? 'Arabic' : 'English');
     
     // Show loading state
     showLoading();
@@ -56,6 +78,14 @@ async function handleFormSubmit(e) {
 function displayBlueprint(blueprint) {
     const resultsSection = document.getElementById('resultsSection');
     
+    // Handle empty data gracefully
+    const phases = blueprint.phases || [];
+    const serviceRecommendations = blueprint.service_recommendations || [];
+    const agencyShowcase = blueprint.agency_showcase || {};
+    const competitors = blueprint.competitors || [];
+    const creativeTouches = blueprint.creative_touches || [];
+    const nextSteps = blueprint.next_steps || [];
+    
     resultsSection.innerHTML = `
         <!-- Executive Summary -->
         <div class="card">
@@ -63,36 +93,37 @@ function displayBlueprint(blueprint) {
             <div class="summary-grid">
                 <div class="summary-item">
                     <span class="label">Project Name:</span>
-                    <span class="value">${blueprint.project_name}</span>
+                    <span class="value">${blueprint.project_name || 'Your Project'}</span>
                 </div>
                 <div class="summary-item">
                     <span class="label">Business Type:</span>
-                    <span class="value">${blueprint.business_type}</span>
+                    <span class="value">${blueprint.business_type || 'General Business'}</span>
                 </div>
                 <div class="summary-item">
                     <span class="label">Target Market:</span>
-                    <span class="value">${blueprint.target_market}</span>
+                    <span class="value">${blueprint.target_market || 'UAE Market'}</span>
                 </div>
                 <div class="summary-item">
                     <span class="label">Launch Mode:</span>
-                    <span class="value">${blueprint.launch_mode}</span>
+                    <span class="value">${blueprint.launch_mode || 'Hybrid'}</span>
                 </div>
                 <div class="summary-item">
                     <span class="label">Timeline:</span>
-                    <span class="value">${blueprint.timeline}</span>
+                    <span class="value">${blueprint.timeline || '3-6 months'}</span>
                 </div>
                 <div class="summary-item">
                     <span class="label">Budget Estimate:</span>
-                    <span class="value">${blueprint.budget_estimate}</span>
+                    <span class="value">${blueprint.budget_estimate || 'To be determined'}</span>
                 </div>
             </div>
         </div>
 
         <!-- Project Phases -->
+        ${phases.length > 0 ? `
         <div class="card">
             <h2>📊 Multi-Phase Action Plan</h2>
             <div class="phases-timeline">
-                ${blueprint.phases.map((phase, index) => `
+                ${phases.map((phase, index) => `
                     <div class="phase-card">
                         <div class="phase-number">${index + 1}</div>
                         <h3>${phase.phase_name}</h3>
@@ -122,11 +153,13 @@ function displayBlueprint(blueprint) {
                 `).join('')}
             </div>
         </div>
+        ` : ''}
 
         <!-- Service Recommendations -->
+        ${serviceRecommendations.length > 0 ? `
         <div class="card">
             <h2>🛠 Service Line Recommendations</h2>
-            ${blueprint.service_recommendations.map(service => `
+            ${serviceRecommendations.map(service => `
                 <div class="service-card">
                     <h3>${service.name}</h3>
                     <p><strong>Why Essential:</strong> ${service.why_essential}</p>
@@ -138,11 +171,13 @@ function displayBlueprint(blueprint) {
                 </div>
             `).join('')}
         </div>
+        ` : ''}
 
         <!-- Agency Showcase -->
+        ${Object.keys(agencyShowcase).length > 0 ? `
         <div class="card">
             <h2>🏢 Recommended Agencies</h2>
-            ${Object.entries(blueprint.agency_showcase).map(([service, agencies]) => `
+            ${Object.entries(agencyShowcase).map(([service, agencies]) => `
                 <div class="agency-section">
                     <h3>For ${service}:</h3>
                     <div class="agency-grid">
@@ -160,18 +195,20 @@ function displayBlueprint(blueprint) {
                             </div>
                         `).join('')}
                     </div>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" onclick="requestMatchmaking()">
                         💡 Not sure whom to pick? Let us shortlist 3 best-fit agencies for you
                     </button>
                 </div>
             `).join('')}
         </div>
+        ` : ''}
 
         <!-- Competitors -->
+        ${competitors.length > 0 ? `
         <div class="card">
             <h2>🎯 Competitor Watchlist</h2>
             <div class="competitor-list">
-                ${blueprint.competitors.map(comp => `
+                ${competitors.map(comp => `
                     <div class="competitor-item">
                         <strong>${comp.name}</strong>
                         <span>${comp.location}</span>
@@ -181,20 +218,26 @@ function displayBlueprint(blueprint) {
                 `).join('')}
             </div>
         </div>
+        ` : ''}
 
         <!-- Creative Touches -->
+        ${creativeTouches.length > 0 ? `
         <div class="card">
             <h2>✨ Creative Touches & Add-Ons</h2>
             <ul class="creative-list">
-                ${blueprint.creative_touches.map(touch => `<li>${touch}</li>`).join('')}
+                ${creativeTouches.map(touch => `<li>${touch}</li>`).join('')}
             </ul>
         </div>
+        ` : ''}
 
         <!-- Next Steps -->
         <div class="card">
             <h2>👉 Next Steps</h2>
             <ol class="next-steps">
-                ${blueprint.next_steps.map(step => `<li>${step}</li>`).join('')}
+                ${nextSteps.length > 0 ? 
+                    nextSteps.map(step => `<li>${step}</li>`).join('') :
+                    '<li>Review your generated blueprint</li><li>Contact our team for implementation</li>'
+                }
             </ol>
             
             <div class="cta-buttons">
@@ -224,7 +267,7 @@ function handleLanguageChange(lang) {
     // Toggle RTL for Arabic
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     
-    // Update UI text (you'd implement full translation here)
+    // Update UI text
     if (lang === 'ar') {
         document.querySelector('h1').textContent = '🚀 مولد مخطط مشروع Topsdraw بالذكاء الاصطناعي';
     } else {
@@ -242,7 +285,19 @@ function hideLoading() {
 }
 
 function showError(message) {
-    alert(message);
+    // Better error display
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = `
+        <div style="background: #fee; border: 1px solid #fcc; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+            <strong>Error:</strong> ${message}
+        </div>
+    `;
+    document.querySelector('.input-section').prepend(errorDiv);
+    
+    setTimeout(() => {
+        errorDiv.remove();
+    }, 5000);
 }
 
 // Action functions
@@ -255,5 +310,28 @@ function bookConcierge() {
 }
 
 function downloadPDF() {
-    alert('PDF download feature coming soon!');
+    if (generatedBlueprint) {
+        // Create a text version of the blueprint
+        const text = `
+TOPSDRAW PROJECT BLUEPRINT
+========================
+Project Name: ${generatedBlueprint.project_name}
+Business Type: ${generatedBlueprint.business_type}
+Target Market: ${generatedBlueprint.target_market}
+Timeline: ${generatedBlueprint.timeline}
+Budget: ${generatedBlueprint.budget_estimate}
+
+Generated on: ${new Date(generatedBlueprint.generated_at).toLocaleString()}
+        `;
+        
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Topsdraw_Blueprint_${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } else {
+        alert('No blueprint to download yet. Please generate one first.');
+    }
 }
