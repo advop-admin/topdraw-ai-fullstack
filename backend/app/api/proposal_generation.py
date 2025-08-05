@@ -91,14 +91,14 @@ async def regenerate_proposal_section(
             raise HTTPException(status_code=400, detail="Section name is required")
         
         prompt = f"""
-        Regenerate the "{section_name}" section of a business proposal for QBurst.
+        Regenerate the "{section_name}" section of a business proposal for Topsdraw Compass.
         
         Context: {context}
         
         Specific Requirements: {requirements}
         
         Generate only the content for this section, maintaining a professional tone
-        and focusing on QBurst's capabilities and value proposition.
+        and focusing on Topsdraw Compass's capabilities and value proposition.
         """
         
         response = gemini_service.model.generate_content(prompt)

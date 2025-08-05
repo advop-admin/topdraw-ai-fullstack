@@ -1,1 +1,1 @@
-"""QBurst Proposal Generator Backend Application""" 
+"""Topsdraw Compass Proposal Generator Backend Application""" 

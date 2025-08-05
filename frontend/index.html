@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QBurst Business Development Tool</title>
+    <title>Topsdraw Compass Business Development Tool</title>
     <style>
         :root {
-            --qburst-blue: #2563eb;
-            --qburst-blue-light: #3b82f6;
+            --topsdraw-compass-blue: #2563eb;
+            --topsdraw-compass-blue-light: #3b82f6;
             --success-green: #10b981;
             --warning-orange: #f59e0b;
             --error-red: #ef4444;
@@ -54,7 +54,7 @@
         }
 
         .header h1 {
-            color: var(--qburst-blue);
+            color: var(--topsdraw-compass-blue);
             font-size: 32px;
             font-weight: 800;
             margin-bottom: 8px;
@@ -140,7 +140,7 @@
         }
 
         .tab-button.active {
-            background: var(--qburst-blue);
+            background: var(--topsdraw-compass-blue);
             color: white;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
@@ -201,7 +201,7 @@
 
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
-            border-color: var(--qburst-blue);
+            border-color: var(--topsdraw-compass-blue);
             background: white;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
@@ -228,13 +228,13 @@
         }
 
         .btn-primary {
-            background: var(--qburst-blue);
+            background: var(--topsdraw-compass-blue);
             color: white;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
         .btn-primary:hover {
-            background: var(--qburst-blue-light);
+            background: var(--topsdraw-compass-blue-light);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
         }
@@ -286,7 +286,7 @@
         }
 
         .result-card:hover {
-            border-color: var(--qburst-blue);
+            border-color: var(--topsdraw-compass-blue);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
@@ -329,7 +329,7 @@
 
         #proposalEditor:focus {
             outline: none;
-            border-color: var(--qburst-blue);
+            border-color: var(--topsdraw-compass-blue);
             background: white;
         }
 
@@ -356,7 +356,7 @@
 
         .alert-info {
             background: rgba(37, 99, 235, 0.1);
-            border-color: var(--qburst-blue);
+            border-color: var(--topsdraw-compass-blue);
             color: #1d4ed8;
         }
 
@@ -387,7 +387,7 @@
             width: 48px;
             height: 48px;
             border: 4px solid var(--gray-200);
-            border-top-color: var(--qburst-blue);
+            border-top-color: var(--topsdraw-compass-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
@@ -434,7 +434,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>QBurst Business Development Tool</h1>
+            <h1>Topsdraw Compass Business Development Tool</h1>
             <p>AI-Powered Client Analysis & Proposal Generation</p>
             <div class="subtitle">Professional tools for intelligent business development</div>
         </div>
@@ -466,7 +466,7 @@
             <div class="card">
                 <h3>Client Analysis</h3>
                 <p style="color: var(--gray-600); margin-bottom: 24px;">
-                    Enter client information to analyze their business profile and find relevant QBurst project experience.
+                    Enter client information to analyze their business profile and find relevant Topsdraw Compass project experience.
                 </p>
                 
                 <form id="clientForm">
@@ -508,7 +508,7 @@
             <div class="card">
                 <h3>Proposal Generation</h3>
                 <p style="color: var(--gray-600); margin-bottom: 24px;">
-                    Generate a customized proposal based on client analysis and QBurst's relevant project experience.
+                    Generate a customized proposal based on client analysis and Topsdraw Compass's relevant project experience.
                 </p>
                 
                 <div id="proposalForm">
@@ -726,7 +726,7 @@
                formData.append('social_urls', JSON.stringify(socialUrls));
                
                // Update loading text
-               loadingText.textContent = 'Finding similar QBurst projects...';
+               loadingText.textContent = 'Finding similar Topsdraw Compass projects...';
                
                // Make API call
                const result = await apiCall('/api/analyze-client', 'POST', formData);
@@ -764,7 +764,7 @@
            // Display client data with professional formatting
            const clientData = data.scraped_data;
            clientDataContainer.innerHTML = `
-               <div class="result-card" style="border: 2px solid var(--qburst-blue); background: rgba(37, 99, 235, 0.05);">
+               <div class="result-card" style="border: 2px solid var(--topsdraw-compass-blue); background: rgba(37, 99, 235, 0.05);">
                    <h4>📊 Company Profile</h4>
                    <p><strong>Industry:</strong> ${clientData.industry || 'Technology/General'}</p>
                    <p><strong>Company Size:</strong> ${clientData.company_size || 'Not specified'}</p>
@@ -778,7 +778,7 @@
            // Display matched projects with business focus
            if (data.matched_projects && data.matched_projects.length > 0) {
                projectsContainer.innerHTML = `
-                   <h4 style="margin-top: 24px; color: var(--gray-800);">🎯 Relevant QBurst Experience</h4>
+                   <h4 style="margin-top: 24px; color: var(--gray-800);">🎯 Relevant Topsdraw Compass Experience</h4>
                    <div class="results-grid">
                        ${data.matched_projects.map(project => `
                            <div class="result-card">
@@ -796,7 +796,7 @@
                    <div class="alert alert-info" style="margin-top: 24px;">
                        <strong>📋 Project Analysis</strong><br>
                        While we have extensive project experience, no direct matches were found for this specific client profile. 
-                       Our proposal will highlight QBurst's broader capabilities and relevant industry experience.
+                       Our proposal will highlight Topsdraw Compass's broader capabilities and relevant industry experience.
                    </div>
                `;
            }
@@ -844,7 +844,7 @@
                    custom_requirements: customRequirements || null
                };
                
-               loadingText.textContent = 'Incorporating QBurst project experience...';
+               loadingText.textContent = 'Incorporating Topsdraw Compass project experience...';
                
                const result = await apiCall('/api/generate-proposal', 'POST', requestData);
                
@@ -874,7 +874,7 @@
            
            // Display metadata with professional formatting
            meta.innerHTML = `
-               <div style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--qburst-blue);">
+               <div style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--topsdraw-compass-blue);">
                    <div style="font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">
                        📄 Proposal Generated Successfully
                    </div>
@@ -889,7 +889,7 @@
            // Display proposal content with better formatting
            const formattedContent = data.proposal_content
                .replace(/\n/g, '<br>')
-               .replace(/#{1,3}\s*([^\n]+)/g, '<h3 style="color: var(--qburst-blue); margin: 24px 0 12px 0; font-weight: 700;">$1</h3>')
+               .replace(/#{1,3}\s*([^\n]+)/g, '<h3 style="color: var(--topsdraw-compass-blue); margin: 24px 0 12px 0; font-weight: 700;">$1</h3>')
                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
            
            editor.innerHTML = formattedContent;
@@ -913,7 +913,7 @@
                
                // Replace the section in the editor
                const editor = document.getElementById('proposalEditor');
-               const newContent = `\n\n<h3 style="color: var(--qburst-blue); margin: 24px 0 12px 0; font-weight: 700;">${result.section_name}</h3>\n${result.section_content}\n\n`;
+               const newContent = `\n\n<h3 style="color: var(--topsdraw-compass-blue); margin: 24px 0 12px 0; font-weight: 700;">${result.section_name}</h3>\n${result.section_content}\n\n`;
                editor.innerHTML += newContent.replace(/\n/g, '<br>');
                
                showAlert(`✅ Section "${sectionName}" regenerated successfully!`, 'success');
@@ -940,7 +940,7 @@
                const url = URL.createObjectURL(blob);
                const a = document.createElement('a');
                a.href = url;
-               a.download = `QBurst_Proposal_${clientName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+               a.download = `Topsdraw_Compass_Proposal_${clientName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
                document.body.appendChild(a);
                a.click();
                document.body.removeChild(a);

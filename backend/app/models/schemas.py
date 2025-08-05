@@ -71,4 +71,64 @@ class HealthSchema(BaseModel):
     status: str
     message: str
     version: str
-    timestamp: datetime = datetime.now() 
+    timestamp: datetime = datetime.now()
+
+class BlueprintRequestSchema(BaseModel):
+    """Blueprint generation request schema"""
+    business_idea: str
+    industry: Optional[str] = ""
+    location: Optional[str] = ""
+    budget_range: Optional[str] = ""
+    timeline: Optional[str] = ""
+    target_audience: Optional[str] = ""
+
+class BlueprintResponseSchema(BaseModel):
+    """Blueprint generation response schema"""
+    blueprint: Dict[str, Any]
+    service_recommendations: List[Dict[str, Any]]
+    competitors: List[Dict[str, Any]]
+    agency_recommendations: Dict[str, List[Dict[str, Any]]]
+    generation_timestamp: datetime
+    processing_time: float
+
+class ServiceRecommendationSchema(BaseModel):
+    """Service recommendation schema"""
+    service_id: str
+    name: str
+    description: str
+    priority_score: int
+    sub_services: List[Dict[str, Any]]
+    typical_duration: str
+    budget_range: str
+    knowledge_articles: List[str]
+
+class AgencyRecommendationSchema(BaseModel):
+    """Agency recommendation schema"""
+    id: str
+    name: str
+    specialization: str
+    match_score: float
+    portfolio_url: str
+    website: str
+    location: str
+    strengths: List[str]
+    experience_years: int
+    team_size: int
+    hourly_rate: str
+    project_range: str
+    case_studies: List[Dict[str, Any]]
+    availability: str
+    response_time: str
+    languages: List[str]
+
+class CompetitorAnalysisSchema(BaseModel):
+    """Competitor analysis schema"""
+    name: str
+    website: str
+    type: str
+    summary: str
+    strengths: List[str]
+    weaknesses: List[str]
+    market_position: str
+    target_audience: str
+    revenue_model: str 

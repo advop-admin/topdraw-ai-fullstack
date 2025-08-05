@@ -1,0 +1,332 @@
+{
+  "uae": [
+    {
+      "metric": "Digital Economy Growth",
+      "value": "12.3%",
+      "source": "UAE Digital Economy Report 2024",
+      "trend": "up",
+      "description": "Annual growth rate of UAE's digital economy"
+    },
+    {
+      "metric": "E-commerce Market Size",
+      "value": "$27.2B",
+      "source": "Statista 2024",
+      "trend": "up",
+      "description": "Total e-commerce market value in UAE"
+    },
+    {
+      "metric": "Tech Startup Funding",
+      "value": "$1.8B",
+      "source": "Magnitt 2024",
+      "trend": "up",
+      "description": "Total funding raised by UAE startups"
+    },
+    {
+      "metric": "Digital Adoption Rate",
+      "value": "94%",
+      "source": "UAE Digital Government",
+      "trend": "up",
+      "description": "Percentage of population using digital services"
+    }
+  ],
+  "dubai": [
+    {
+      "metric": "Business Registration Growth",
+      "value": "18.5%",
+      "source": "Dubai Chamber 2024",
+      "trend": "up",
+      "description": "Annual increase in new business registrations"
+    },
+    {
+      "metric": "Tourism Revenue",
+      "value": "$29.4B",
+      "source": "Dubai Tourism 2024",
+      "trend": "up",
+      "description": "Total tourism revenue in Dubai"
+    },
+    {
+      "metric": "Smart City Investment",
+      "value": "$8.7B",
+      "source": "Dubai Smart City",
+      "trend": "up",
+      "description": "Investment in smart city initiatives"
+    },
+    {
+      "metric": "Startup Ecosystem",
+      "value": "2,500+",
+      "source": "Dubai Future Foundation",
+      "trend": "up",
+      "description": "Active startups in Dubai"
+    }
+  ],
+  "abu_dhabi": [
+    {
+      "metric": "Economic Diversification",
+      "value": "52%",
+      "source": "Abu Dhabi Economic Council",
+      "trend": "up",
+      "description": "Non-oil contribution to GDP"
+    },
+    {
+      "metric": "Foreign Direct Investment",
+      "value": "$15.2B",
+      "source": "Abu Dhabi Investment Office",
+      "trend": "up",
+      "description": "Total FDI attracted in 2024"
+    },
+    {
+      "metric": "Tech Hub Development",
+      "value": "400+",
+      "source": "Hub71",
+      "trend": "up",
+      "description": "Tech companies in Hub71 ecosystem"
+    },
+    {
+      "metric": "Innovation Index",
+      "value": "8.7/10",
+      "source": "Global Innovation Index",
+      "trend": "up",
+      "description": "UAE innovation score"
+    }
+  ],
+  "ecommerce": [
+    {
+      "metric": "Online Shopping Penetration",
+      "value": "87%",
+      "source": "UAE E-commerce Report",
+      "trend": "up",
+      "description": "Percentage of population shopping online"
+    },
+    {
+      "metric": "Mobile Commerce",
+      "value": "73%",
+      "source": "Statista 2024",
+      "trend": "up",
+      "description": "Percentage of e-commerce via mobile"
+    },
+    {
+      "metric": "Average Order Value",
+      "value": "$156",
+      "source": "UAE Retail Analytics",
+      "trend": "up",
+      "description": "Average online purchase value"
+    },
+    {
+      "metric": "Cross-border Shopping",
+      "value": "42%",
+      "source": "UAE Customs Data",
+      "trend": "up",
+      "description": "Percentage of online purchases from abroad"
+    }
+  ],
+  "fitness_health": [
+    {
+      "metric": "Health & Wellness Market",
+      "value": "$4.2B",
+      "source": "UAE Health Report 2024",
+      "trend": "up",
+      "description": "Total health and wellness market size"
+    },
+    {
+      "metric": "Fitness App Usage",
+      "value": "68%",
+      "source": "UAE Digital Health Survey",
+      "trend": "up",
+      "description": "Percentage using fitness apps"
+    },
+    {
+      "metric": "Gym Memberships",
+      "value": "2.1M",
+      "source": "UAE Fitness Industry",
+      "trend": "up",
+      "description": "Total gym memberships in UAE"
+    },
+    {
+      "metric": "Health Tech Investment",
+      "value": "$890M",
+      "source": "UAE Health Tech Fund",
+      "trend": "up",
+      "description": "Investment in health technology"
+    }
+  ],
+  "saas_software": [
+    {
+      "metric": "SaaS Market Growth",
+      "value": "24.7%",
+      "source": "UAE SaaS Report 2024",
+      "trend": "up",
+      "description": "Annual growth rate of SaaS market"
+    },
+    {
+      "metric": "Cloud Adoption",
+      "value": "89%",
+      "source": "UAE Cloud Survey",
+      "trend": "up",
+      "description": "Percentage of businesses using cloud"
+    },
+    {
+      "metric": "Enterprise Software Spend",
+      "value": "$2.8B",
+      "source": "UAE IT Spending Report",
+      "trend": "up",
+      "description": "Total enterprise software spending"
+    },
+    {
+      "metric": "AI/ML Adoption",
+      "value": "67%",
+      "source": "UAE AI Survey",
+      "trend": "up",
+      "description": "Percentage of companies using AI/ML"
+    }
+  ],
+  "education_learning": [
+    {
+      "metric": "EdTech Market Size",
+      "value": "$1.9B",
+      "source": "UAE Education Report 2024",
+      "trend": "up",
+      "description": "Total education technology market"
+    },
+    {
+      "metric": "Online Learning Adoption",
+      "value": "78%",
+      "source": "UAE Education Survey",
+      "trend": "up",
+      "description": "Percentage using online learning platforms"
+    },
+    {
+      "metric": "Corporate Training",
+      "value": "$450M",
+      "source": "UAE Corporate Training",
+      "trend": "up",
+      "description": "Corporate training market size"
+    },
+    {
+      "metric": "Skill Development Demand",
+      "value": "92%",
+      "source": "UAE Skills Survey",
+      "trend": "up",
+      "description": "Percentage seeking skill development"
+    }
+  ],
+  "food_delivery": [
+    {
+      "metric": "Food Delivery Market",
+      "value": "$3.4B",
+      "source": "UAE Food Industry 2024",
+      "trend": "up",
+      "description": "Total food delivery market size"
+    },
+    {
+      "metric": "Delivery App Users",
+      "value": "4.2M",
+      "source": "UAE Mobile App Report",
+      "trend": "up",
+      "description": "Active food delivery app users"
+    },
+    {
+      "metric": "Average Order Frequency",
+      "value": "3.2/week",
+      "source": "UAE Food Delivery Analytics",
+      "trend": "up",
+      "description": "Average orders per user per week"
+    },
+    {
+      "metric": "Cloud Kitchen Growth",
+      "value": "156%",
+      "source": "UAE Restaurant Industry",
+      "trend": "up",
+      "description": "Annual growth in cloud kitchens"
+    }
+  ],
+  "fintech": [
+    {
+      "metric": "FinTech Market Size",
+      "value": "$2.5B",
+      "source": "UAE FinTech Report 2024",
+      "trend": "up",
+      "description": "Total FinTech market value"
+    },
+    {
+      "metric": "Digital Banking Users",
+      "value": "6.8M",
+      "source": "UAE Banking Survey",
+      "trend": "up",
+      "description": "Active digital banking users"
+    },
+    {
+      "metric": "Mobile Payment Adoption",
+      "value": "81%",
+      "source": "UAE Payment Report",
+      "trend": "up",
+      "description": "Percentage using mobile payments"
+    },
+    {
+      "metric": "FinTech Investment",
+      "value": "$1.2B",
+      "source": "UAE FinTech Fund",
+      "trend": "up",
+      "description": "Total FinTech investment in 2024"
+    }
+  ],
+  "real_estate": [
+    {
+      "metric": "Real Estate Market",
+      "value": "$89.7B",
+      "source": "UAE Real Estate Report 2024",
+      "trend": "up",
+      "description": "Total real estate market value"
+    },
+    {
+      "metric": "Property Tech Adoption",
+      "value": "73%",
+      "source": "UAE PropTech Survey",
+      "trend": "up",
+      "description": "Percentage using property technology"
+    },
+    {
+      "metric": "Virtual Property Tours",
+      "value": "89%",
+      "source": "UAE Real Estate Tech",
+      "trend": "up",
+      "description": "Percentage offering virtual tours"
+    },
+    {
+      "metric": "Smart Home Market",
+      "value": "$1.4B",
+      "source": "UAE Smart Home Report",
+      "trend": "up",
+      "description": "Smart home technology market"
+    }
+  ],
+  "general": [
+    {
+      "metric": "GDP Growth Rate",
+      "value": "4.2%",
+      "source": "UAE Central Bank 2024",
+      "trend": "up",
+      "description": "Annual GDP growth rate"
+    },
+    {
+      "metric": "Foreign Investment",
+      "value": "$23.8B",
+      "source": "UAE Investment Report",
+      "trend": "up",
+      "description": "Total foreign direct investment"
+    },
+    {
+      "metric": "Digital Transformation",
+      "value": "91%",
+      "source": "UAE Digital Survey",
+      "trend": "up",
+      "description": "Percentage of businesses digitizing"
+    },
+    {
+      "metric": "Innovation Spending",
+      "value": "$8.9B",
+      "source": "UAE Innovation Fund",
+      "trend": "up",
+      "description": "Total innovation and R&D spending"
+    }
+  ]
+} 

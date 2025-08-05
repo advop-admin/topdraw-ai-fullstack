@@ -1,12 +1,12 @@
-# Takumi.ai BDT Dashboard for QBurst
+# Topsdraw Compass Dashboard
 
-An AI-powered dashboard for QBurst's Business Development Team (BDT) to analyze client information, match historical projects using semantic similarity, and generate tailored business proposals. This tool is part of the Takumi.ai ecosystem and works alongside the Takumi.ai Project Management System.
+An AI-powered dashboard for Topsdraw Compass to analyze client information, match historical projects using semantic similarity, and generate tailored business proposals. This tool is part of the Topsdraw Compass ecosystem and works alongside the Topsdraw Compass Project Management System.
 
 ## 🚀 Features
 
 - **Client Analysis**: Scrapes and analyzes client websites and social media using Gemini AI
 - **Smart Project Matching**: Uses ChromaDB vector similarity to find relevant historical projects
-- **AI Proposal Generation**: Creates customized proposals using Gemini AI and QBurst templates
+- **AI Proposal Generation**: Creates customized proposals using Gemini AI and Topsdraw Compass templates
 - **Rich Text Editing**: Edit and customize generated proposals with a full-featured editor
 - **Export Options**: Download or copy proposals for external use
 
@@ -15,7 +15,7 @@ An AI-powered dashboard for QBurst's Business Development Team (BDT) to analyze 
 - **Frontend**: React with TypeScript, Tailwind CSS, React Quill editor
 - **Backend**: FastAPI with Python, integrates Gemini AI and ChromaDB
 - **Vector Database**: ChromaDB for semantic project matching
-- **Data Source**: Connects to Takumi.ai Project Management System's PostgreSQL database via DATABASE_URL
+- **Data Source**: Connects to Topsdraw Compass Project Management System's PostgreSQL database via DATABASE_URL
 - **Containerization**: Docker & Docker Compose for easy deployment
 
 ## 📋 Prerequisites
@@ -26,7 +26,7 @@ An AI-powered dashboard for QBurst's Business Development Team (BDT) to analyze 
 
 2. **Docker & Docker Compose** installed on your system
 
-3. **Access to the Takumi.ai PM PostgreSQL database** (local or cloud)
+3. **Access to the Topsdraw Compass PM PostgreSQL database** (local or cloud)
 
 ## 🛠️ Quick Setup
 
@@ -40,11 +40,11 @@ cp env.example .env
 
 **Option A: DATABASE_URL (Recommended - Cloud Ready)**
 ```env
-# For local Takumi.ai PM system
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/takumi_pm
+# For local Topsdraw Compass PM system
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/topsdraw_compass_pm
 
 # For cloud database (AWS RDS, Google Cloud SQL, etc.)
-DATABASE_URL=postgresql://username:password@your-cloud-db-host:5432/takumi_pm
+DATABASE_URL=postgresql://username:password@your-cloud-db-host:5432/topsdraw_compass_pm
 
 # For Railway/Heroku
 DATABASE_URL=postgresql://user:pass@hostname:port/database
@@ -54,7 +54,7 @@ DATABASE_URL=postgresql://user:pass@hostname:port/database
 ```env
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=takumi_pm
+POSTGRES_DB=topsdraw_compass_pm
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 ```
@@ -69,7 +69,7 @@ CHROMA_HOST=localhost
 CHROMA_PORT=8001
 
 # Database Connection (Choose one approach)
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/takumi_pm
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/topsdraw_compass_pm
 
 # App Configuration
 REACT_APP_API_URL=http://localhost:8000
@@ -102,17 +102,17 @@ This system is designed to work with various database configurations:
 
 ### **Local Development**
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/takumi_pm
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/topsdraw_compass_pm
 ```
 
 ### **AWS RDS**
 ```env
-DATABASE_URL=postgresql://username:password@your-rds-endpoint.amazonaws.com:5432/takumi_pm
+DATABASE_URL=postgresql://username:password@your-rds-endpoint.amazonaws.com:5432/topsdraw_compass_pm
 ```
 
 ### **Google Cloud SQL**
 ```env
-DATABASE_URL=postgresql://username:password@your-cloud-sql-ip:5432/takumi_pm
+DATABASE_URL=postgresql://username:password@your-cloud-sql-ip:5432/topsdraw_compass_pm
 ```
 
 ### **Railway/Heroku**
@@ -127,7 +127,7 @@ DATABASE_URL=postgresql://username:password@your-provider-host:5432/database_nam
 
 ## 📊 Database Schema Compatibility
 
-The system expects the following table structure in your Takumi.ai PM database:
+The system expects the following table structure in your Topsdraw Compass PM database:
 
 ```sql
 CREATE TABLE projects (
@@ -192,7 +192,7 @@ Set up a cron job or webhook to automatically sync data:
 
 ### 3. Generate Proposal
 - Click "Generate Proposal" to create AI-powered proposal
-- Uses QBurst templates and matched project examples
+- Uses Topsdraw Compass templates and matched project examples
 - Incorporates client-specific insights
 
 ### 4. Edit & Export
@@ -409,9 +409,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For support and questions:
 - Create an issue in this repository
-- Contact the QBurst development team
+- Contact the Topsdraw Compass development team
 - Check the API documentation at `/docs` endpoint
 
 ---
 
-**Built with ❤️ for QBurst by Takumi.ai** - Empowering intelligent proposal generation with cloud-ready architecture
+**Built with ❤️ for Topsdraw Compass** - Empowering intelligent proposal generation with cloud-ready architecture

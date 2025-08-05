@@ -1,0 +1,247 @@
+{
+  "ecommerce": [
+    {
+      "name": "Amazon",
+      "website": "https://amazon.com",
+      "type": "Inspirational",
+      "summary": "Global e-commerce giant with advanced logistics and AI-powered recommendations",
+      "strengths": ["Massive scale", "Advanced logistics", "AI recommendations", "Prime membership"],
+      "weaknesses": ["Complex seller ecosystem", "High competition", "Limited personalization"],
+      "market_position": "Market leader",
+      "target_audience": "Mass market consumers",
+      "revenue_model": "Commission-based, subscription (Prime)"
+    },
+    {
+      "name": "Shopify",
+      "website": "https://shopify.com",
+      "type": "Adjacent",
+      "summary": "E-commerce platform enabling businesses to create online stores",
+      "strengths": ["Easy setup", "App ecosystem", "Payment integration", "Mobile optimization"],
+      "weaknesses": ["Transaction fees", "Limited customization", "Platform dependency"],
+      "market_position": "Leading e-commerce platform",
+      "target_audience": "Small to medium businesses",
+      "revenue_model": "Subscription + transaction fees"
+    },
+    {
+      "name": "Etsy",
+      "website": "https://etsy.com",
+      "type": "Direct",
+      "summary": "Marketplace for handmade and vintage items",
+      "strengths": ["Unique products", "Artisan community", "Global reach", "Mobile app"],
+      "weaknesses": ["Limited product categories", "Quality control challenges", "High fees"],
+      "market_position": "Niche marketplace leader",
+      "target_audience": "Handmade and vintage buyers",
+      "revenue_model": "Listing fees + commission"
+    }
+  ],
+  "fitness_health": [
+    {
+      "name": "Peloton",
+      "website": "https://onepeloton.com",
+      "type": "Inspirational",
+      "summary": "Connected fitness platform with live and on-demand classes",
+      "strengths": ["Premium content", "Community features", "Hardware integration", "Live classes"],
+      "weaknesses": ["High cost", "Equipment dependency", "Limited workout variety"],
+      "market_position": "Premium fitness leader",
+      "target_audience": "High-end fitness enthusiasts",
+      "revenue_model": "Hardware sales + subscription"
+    },
+    {
+      "name": "MyFitnessPal",
+      "website": "https://myfitnesspal.com",
+      "type": "Adjacent",
+      "summary": "Calorie tracking and nutrition app with social features",
+      "strengths": ["Large food database", "Social features", "Free tier", "Cross-platform"],
+      "weaknesses": ["Limited workout tracking", "Ad-heavy free version", "Data accuracy issues"],
+      "market_position": "Popular nutrition tracking app",
+      "target_audience": "Health-conscious individuals",
+      "revenue_model": "Freemium + premium subscription"
+    },
+    {
+      "name": "Fitbit",
+      "website": "https://fitbit.com",
+      "type": "Direct",
+      "summary": "Fitness tracking devices and health monitoring platform",
+      "strengths": ["Hardware quality", "Health insights", "Sleep tracking", "Community features"],
+      "weaknesses": ["Limited app ecosystem", "Subscription required", "Hardware dependency"],
+      "market_position": "Leading fitness tracker brand",
+      "target_audience": "Fitness tracking enthusiasts",
+      "revenue_model": "Hardware sales + premium subscription"
+    }
+  ],
+  "saas_business": [
+    {
+      "name": "Salesforce",
+      "website": "https://salesforce.com",
+      "type": "Inspirational",
+      "summary": "Cloud-based CRM platform with extensive business applications",
+      "strengths": ["Comprehensive CRM", "Enterprise features", "App ecosystem", "AI integration"],
+      "weaknesses": ["Complex setup", "High cost", "Steep learning curve", "Vendor lock-in"],
+      "market_position": "CRM market leader",
+      "target_audience": "Enterprise businesses",
+      "revenue_model": "Subscription-based pricing"
+    },
+    {
+      "name": "HubSpot",
+      "website": "https://hubspot.com",
+      "type": "Adjacent",
+      "summary": "Inbound marketing and sales platform with CRM capabilities",
+      "strengths": ["User-friendly", "Free tier", "Marketing automation", "Content tools"],
+      "weaknesses": ["Limited customization", "High scaling costs", "Feature fragmentation"],
+      "market_position": "Leading inbound marketing platform",
+      "target_audience": "Small to medium businesses",
+      "revenue_model": "Freemium + tiered pricing"
+    },
+    {
+      "name": "Zoho",
+      "website": "https://zoho.com",
+      "type": "Direct",
+      "summary": "Business software suite with CRM, email, and productivity tools",
+      "strengths": ["Affordable pricing", "Comprehensive suite", "Good integration", "Mobile apps"],
+      "weaknesses": ["Less polished UI", "Limited advanced features", "Smaller ecosystem"],
+      "market_position": "Affordable business software provider",
+      "target_audience": "Small businesses and startups",
+      "revenue_model": "Subscription-based pricing"
+    }
+  ],
+  "education_learning": [
+    {
+      "name": "Coursera",
+      "website": "https://coursera.org",
+      "type": "Inspirational",
+      "summary": "Online learning platform with university partnerships and certifications",
+      "strengths": ["University partnerships", "Professional certificates", "High-quality content", "Flexible learning"],
+      "weaknesses": ["High course costs", "Limited interaction", "Completion rates", "Generic content"],
+      "market_position": "Leading online education platform",
+      "target_audience": "Professional learners and career changers",
+      "revenue_model": "Course sales + subscription (Plus)"
+    },
+    {
+      "name": "Udemy",
+      "website": "https://udemy.com",
+      "type": "Adjacent",
+      "summary": "Marketplace for online courses with diverse topics and instructors",
+      "strengths": ["Wide course variety", "Affordable pricing", "Lifetime access", "Mobile learning"],
+      "weaknesses": ["Quality inconsistency", "No formal accreditation", "Limited instructor support"],
+      "market_position": "Popular course marketplace",
+      "target_audience": "Skill learners and hobbyists",
+      "revenue_model": "Course sales + subscription (Personal Plan)"
+    },
+    {
+      "name": "Skillshare",
+      "website": "https://skillshare.com",
+      "type": "Direct",
+      "summary": "Creative learning platform with project-based courses",
+      "strengths": ["Creative focus", "Project-based learning", "Community features", "Affordable subscription"],
+      "weaknesses": ["Limited business courses", "No certificates", "Inconsistent quality"],
+      "market_position": "Creative learning platform",
+      "target_audience": "Creative professionals and hobbyists",
+      "revenue_model": "Subscription-based pricing"
+    }
+  ],
+  "food_delivery": [
+    {
+      "name": "Uber Eats",
+      "website": "https://ubereats.com",
+      "type": "Inspirational",
+      "summary": "Global food delivery platform with restaurant partnerships",
+      "strengths": ["Global reach", "Driver network", "Restaurant variety", "Real-time tracking"],
+      "weaknesses": ["High fees", "Delivery delays", "Quality control", "Driver dependency"],
+      "market_position": "Leading food delivery platform",
+      "target_audience": "Urban consumers",
+      "revenue_model": "Commission + delivery fees"
+    },
+    {
+      "name": "DoorDash",
+      "website": "https://doordash.com",
+      "type": "Direct",
+      "summary": "Food delivery service with focus on local restaurants",
+      "strengths": ["Local restaurant focus", "DashPass subscription", "Wide coverage", "Good customer service"],
+      "weaknesses": ["High fees", "Delivery delays", "Limited international presence"],
+      "market_position": "Major food delivery player",
+      "target_audience": "Local food consumers",
+      "revenue_model": "Commission + delivery fees + subscription"
+    },
+    {
+      "name": "Grubhub",
+      "website": "https://grubhub.com",
+      "type": "Direct",
+      "summary": "Food delivery platform with restaurant partnerships",
+      "strengths": ["Established brand", "Restaurant partnerships", "Loyalty program", "Corporate accounts"],
+      "weaknesses": ["Smaller driver network", "Limited innovation", "Market share decline"],
+      "market_position": "Established food delivery platform",
+      "target_audience": "Urban and suburban consumers",
+      "revenue_model": "Commission + delivery fees"
+    }
+  ],
+  "fintech": [
+    {
+      "name": "Stripe",
+      "website": "https://stripe.com",
+      "type": "Inspirational",
+      "summary": "Payment processing platform for online businesses",
+      "strengths": ["Developer-friendly", "Global reach", "Advanced features", "Reliable infrastructure"],
+      "weaknesses": ["High fees", "Complex pricing", "Limited customer support", "Account freezes"],
+      "market_position": "Leading payment processor",
+      "target_audience": "Online businesses and developers",
+      "revenue_model": "Transaction fees + subscription"
+    },
+    {
+      "name": "Square",
+      "website": "https://square.com",
+      "type": "Adjacent",
+      "summary": "Payment and business solutions for small businesses",
+      "strengths": ["Easy setup", "Hardware integration", "Business tools", "Transparent pricing"],
+      "weaknesses": ["Limited international presence", "Higher fees for large volumes", "Basic features"],
+      "market_position": "Small business payment leader",
+      "target_audience": "Small businesses and entrepreneurs",
+      "revenue_model": "Transaction fees + hardware sales"
+    },
+    {
+      "name": "PayPal",
+      "website": "https://paypal.com",
+      "type": "Direct",
+      "summary": "Digital payment platform with buyer/seller protection",
+      "strengths": ["Global reach", "Buyer protection", "Easy integration", "Trusted brand"],
+      "weaknesses": ["High fees", "Account freezes", "Limited business tools", "Poor customer service"],
+      "market_position": "Established digital payment platform",
+      "target_audience": "Online shoppers and sellers",
+      "revenue_model": "Transaction fees + business services"
+    }
+  ],
+  "real_estate": [
+    {
+      "name": "Zillow",
+      "website": "https://zillow.com",
+      "type": "Inspirational",
+      "summary": "Real estate marketplace with property listings and estimates",
+      "strengths": ["Comprehensive listings", "Zestimate tool", "Mobile app", "Market insights"],
+      "weaknesses": ["Inaccurate estimates", "Limited international presence", "Agent conflicts"],
+      "market_position": "Leading real estate platform",
+      "target_audience": "Home buyers and sellers",
+      "revenue_model": "Advertising + lead generation"
+    },
+    {
+      "name": "Redfin",
+      "website": "https://redfin.com",
+      "type": "Adjacent",
+      "summary": "Real estate brokerage with technology-driven approach",
+      "strengths": ["Lower commission rates", "Technology integration", "Transparent pricing", "Agent support"],
+      "weaknesses": ["Limited market coverage", "Mixed agent quality", "Service limitations"],
+      "market_position": "Technology-driven real estate brokerage",
+      "target_audience": "Cost-conscious home buyers/sellers",
+      "revenue_model": "Commission + technology fees"
+    },
+    {
+      "name": "Realtor.com",
+      "website": "https://realtor.com",
+      "type": "Direct",
+      "summary": "Real estate listings platform with MLS integration",
+      "strengths": ["MLS integration", "Accurate listings", "Professional tools", "Market data"],
+      "weaknesses": ["Limited features", "Poor mobile experience", "Agent-focused"],
+      "market_position": "Traditional real estate platform",
+      "target_audience": "Home buyers and real estate professionals",
+      "revenue_model": "Advertising + lead generation"
+    }
+  ]
+} 

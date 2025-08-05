@@ -1,6 +1,6 @@
 """
 Script to vectorize project data from PostgreSQL and store in ChromaDB
-Part of Takumi.ai BDT Dashboard for QBurst
+Part of Topsdraw Compass Dashboard
 """
 
 import sys
@@ -56,7 +56,7 @@ class ProjectVectorizer:
             
             self.collection = self.client.create_collection(
                 name=self.settings.chroma_collection_name,
-                metadata={"description": "Takumi.ai BDT Dashboard for QBurst project embeddings for proposal generation"}
+                metadata={"description": "Topsdraw Compass Dashboard project embeddings for proposal generation"}
             )
             logger.info(f"Created new collection: {self.settings.chroma_collection_name}")
             
@@ -76,7 +76,7 @@ class ProjectVectorizer:
         }
     
     async def fetch_projects_from_postgres(self) -> List[Dict[str, Any]]:
-        """Fetch project data from PostgreSQL (Takumi.ai PM System)"""
+        """Fetch project data from PostgreSQL (Topsdraw Compass PM System)"""
         
         try:
             # Use DATABASE_URL if available, otherwise individual parameters

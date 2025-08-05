@@ -1,21 +1,21 @@
 version: '3.8'
 
 services:
-  bdt-frontend:
+  topsdraw-compass-frontend:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: qb_takumiai_bdt_fullstack_bdt-frontend_1
-    image: qb_takumiai_bdt_fullstack_bdt-frontend:latest
+    container_name: topsdraw_compass_fullstack_frontend_1
+    image: topsdraw_compass_fullstack_frontend:latest
     ports:
       - "3001:3000"
     environment:
       - API_BASE_URL=http://localhost:8000/api
     depends_on:
-      - bdt-backend
+      - topsdraw-compass-backend
     networks:
       - default
-      - takumi-bdt-network
+      - topsdraw-compass-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3000')"]
@@ -23,10 +23,10 @@ services:
       timeout: 10s
       retries: 3
 
-  bdt-backend:
+  topsdraw-compass-backend:
     build: ./backend
-    container_name: qb_takumiai_bdt_fullstack_bdt-backend_1
-    image: qb_takumiai_bdt_fullstack_bdt-backend:latest
+    container_name: topsdraw_compass_fullstack_backend_1
+    image: topsdraw_compass_fullstack_backend:latest
     ports:
       - "8000:8000"
     volumes:
@@ -40,7 +40,7 @@ services:
       - chroma
     networks:
       - default
-      - takumi-bdt-network
+      - topsdraw-compass-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
@@ -50,7 +50,7 @@ services:
 
   chroma:
     image: ghcr.io/chroma-core/chroma:0.5.20
-    container_name: qb_takumiai_bdt_fullstack_chroma_1
+    container_name: topsdraw_compass_fullstack_chroma_1
     ports:
       - "8001:8000"
     environment:
@@ -60,7 +60,7 @@ services:
     volumes:
       - chroma_data:/chroma/chroma
     networks:
-      - takumi-bdt-network
+      - topsdraw-compass-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
@@ -71,12 +71,12 @@ services:
 volumes:
   chroma_data:
     driver: local
-    name: qb_takumiai_bdt_fullstack_chroma_data
+    name: topsdraw_compass_fullstack_chroma_data
 
 networks:
   default:
     external:
-      name: takumi-pm-fullstack_default
-  takumi-bdt-network:
+      name: topsdraw-compass-fullstack_default
+  topsdraw-compass-network:
     driver: bridge
-    name: qb_takumiai_bdt_fullstack_takumi-bdt-network
+    name: topsdraw_compass_fullstack_topsdraw-compass-network

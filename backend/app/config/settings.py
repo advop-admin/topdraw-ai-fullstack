@@ -14,24 +14,24 @@ class Settings(BaseSettings):
     """Application settings"""
     
     # API Configuration
-    app_name: str = "QBurst Proposal Generator"
+    app_name: str = "Topsdraw Compass"
     debug: bool = os.getenv("DEBUG", "false").lower() == "true"
     
     # Gemini API Configuration
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
-    gemini_model: str = "gemini-1.5-flash"
+    gemini_model: str = "gemini-1.5-pro"
     
     # Chroma DB Configuration - Supports both container and cloud
     chroma_host: str = os.getenv("CHROMA_HOST", "chroma")  # Default to container service name
     chroma_port: int = int(os.getenv("CHROMA_PORT", "8000"))
     chroma_api_key: Optional[str] = os.getenv("CHROMA_API_KEY")  # Only needed for cloud
-    chroma_collection_name: str = "qburst_projects"
+    chroma_collection_name: str = "topsdraw_compass_projects"
     
     # PostgreSQL Configuration - DATABASE_URL approach
     database_url: Optional[str] = os.getenv("DATABASE_URL")
     postgres_host: str = os.getenv("POSTGRES_HOST", "localhost")
     postgres_port: int = int(os.getenv("POSTGRES_PORT", "5432"))
-    postgres_db: str = os.getenv("POSTGRES_DB", "takumi_pm")
+    postgres_db: str = os.getenv("POSTGRES_DB", "topsdraw_compass_pm")
     postgres_user: str = os.getenv("POSTGRES_USER", "postgres")
     postgres_password: str = os.getenv("POSTGRES_PASSWORD", "")
     
@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     # Scraping Configuration
     request_timeout: int = 30
     max_retries: int = 3
-    user_agent: str = "QBurst-ProposalBot/1.0"
+    user_agent: str = "Topsdraw-Compass/1.0"
     
     @property
     def get_database_url(self) -> str:

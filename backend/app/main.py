@@ -1,5 +1,5 @@
 """
-QBurst Proposal Generator - Main FastAPI Application
+Topsdraw Compass Proposal Generator - Main FastAPI Application
 Enhanced with automatic migration + vectorization on startup
 """
 
@@ -15,9 +15,10 @@ import sys
 import asyncio
 from contextlib import asynccontextmanager
 
-from .api import client_analysis, proposal_generation
+from .api import client_analysis, proposal_generation, blueprint_generation
 from .services.gemini_service import GeminiService
 from .services.chroma_service import ChromaService
+from .services.compass_service import CompassService
 from .config.settings import get_settings
 
 # Configure logging
@@ -143,7 +144,11 @@ async def initialize_services():
         chroma_service = ChromaService()
         logger.info("✅ ChromaDB service initialized")
         
-        return gemini_service, chroma_service
+        # Initialize Compass service
+        compass_service = CompassService()
+        logger.info("✅ Compass service initialized")
+        
+        return gemini_service, chroma_service, compass_service
         
     except Exception as e:
         logger.error(f"❌ Failed to initialize services: {e}")
@@ -152,7 +157,7 @@ async def initialize_services():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Enhanced application lifespan manager with auto-migration and vectorization"""
-    logger.info("🚀 Starting QBurst Proposal Generator API...")
+    logger.info("🚀 Starting Topsdraw Compass Proposal Generator API...")
     
     # Step 1: Run database migration
     logger.info("📋 Step 1: Database Migration")
@@ -163,11 +168,12 @@ async def lifespan(app: FastAPI):
     # Step 2: Initialize services
     logger.info("📋 Step 2: Service Initialization")
     try:
-        gemini_service, chroma_service = await initialize_services()
+        gemini_service, chroma_service, compass_service = await initialize_services()
         
         # Store services in app state
         app.state.gemini_service = gemini_service
         app.state.chroma_service = chroma_service
+        app.state.compass_service = compass_service
         app.state.startup_vectorization_status = "pending"
         app.state.startup_vectorization_message = "Checking..."
         
@@ -203,18 +209,18 @@ async def lifespan(app: FastAPI):
         app.state.startup_vectorization_status = "error"
         app.state.startup_vectorization_message = f"Error: {str(e)}"
     
-    logger.info("🎯 QBurst API startup complete - ready for requests")
+    logger.info("🎯 Topsdraw Compass API startup complete - ready for requests")
     
     # Application is running
     yield
     
     # Cleanup on shutdown
-    logger.info("🛑 Shutting down QBurst Proposal Generator API...")
+    logger.info("🛑 Shutting down Topsdraw Compass Proposal Generator API...")
     logger.info("✅ Shutdown complete")
 
 # Create FastAPI app with enhanced startup
 app = FastAPI(
-    title="QBurst Proposal Generator API",
+    title="Topsdraw Compass Proposal Generator API",
     description="AI-powered client analysis and proposal generation with automatic setup",
     version="2.0.0",
     lifespan=lifespan
@@ -239,6 +245,7 @@ app.add_middleware(
 # Include API routers
 app.include_router(client_analysis.router, prefix="/api", tags=["Client Analysis"])
 app.include_router(proposal_generation.router, prefix="/api", tags=["Proposal Generation"])
+app.include_router(blueprint_generation.router, prefix="/api", tags=["Topsdraw Compass"])
 
 @app.get("/api/health")
 async def health_check():
@@ -248,7 +255,7 @@ async def health_check():
     
     return {
         "status": "healthy",
-        "message": "QBurst Proposal Generator API is running",
+        "message": "Topsdraw Compass Proposal Generator API is running",
         "version": "2.0.0",
         "startup_vectorization": {
             "status": startup_status,
@@ -282,7 +289,7 @@ async def get_startup_status():
 async def root():
     """Root endpoint with enhanced information"""
     return {
-        "message": "Welcome to QBurst Proposal Generator API v2.0",
+        "message": "Welcome to Topsdraw Compass Proposal Generator API v2.0",
         "version": "2.0.0",
         "features": [
             "Automatic database migration on startup",

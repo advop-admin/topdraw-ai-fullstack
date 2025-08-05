@@ -22,7 +22,7 @@ echo "Starting Docker containers..."
 docker-compose up -d
 
 echo "Ensuring backend is connected to the Postgres network..."
-docker network connect takumi-pm-fullstack_default qb_takumiai_bdt_fullstack_bdt-backend_1 2>/dev/null || true
+docker network connect topsdraw-compass-fullstack_default topsdraw_compass_fullstack_backend_1 2>/dev/null || true
 
 echo "Waiting for backend to be healthy..."
 until curl -s http://localhost:8000/api/health | grep -q "healthy"; do
@@ -30,19 +30,19 @@ until curl -s http://localhost:8000/api/health | grep -q "healthy"; do
 done
 
 echo "Checking PostgreSQL connection..."
-if ! docker-compose exec bdt-backend python -c "import psycopg2, os; conn = psycopg2.connect(os.environ.get('DATABASE_URL')); conn.close()"; then
+if ! docker-compose exec topsdraw-compass-backend python -c "import psycopg2, os; conn = psycopg2.connect(os.environ.get('DATABASE_URL')); conn.close()"; then
   echo "PostgreSQL is not ready or connection failed."
   exit 1
 fi
 
 echo "Running migration script to ensure required columns..."
-docker-compose exec bdt-backend python scripts/migrate_projects_schema.py
+docker-compose exec topsdraw-compass-backend python scripts/migrate_projects_schema.py
 
 echo "Running vectorization script..."
-docker-compose exec bdt-backend python scripts/vectorize_projects.py
+docker-compose exec topsdraw-compass-backend python scripts/vectorize_projects.py
 
 echo "Starting frontend..."
-docker-compose up -d bdt-frontend
+docker-compose up -d topsdraw-compass-frontend
 
 echo "Setup complete! Visit http://localhost:3001"
 
@@ -50,14 +50,14 @@ echo "Setup complete! Visit http://localhost:3001"
 print_step "2.5. Ensuring Database Schema"
 echo ""
 print_check "Running migration script to ensure required columns..."
-docker-compose exec bdt-backend python scripts/migrate_projects_schema.py
+docker-compose exec topsdraw-compass-backend python scripts/migrate_projects_schema.py
 print_success "Database schema is up to date!"
 
 # Step 7: Start frontend
 print_step "7. Starting Frontend Service"
 echo ""
 print_check "Cleaning frontend cache and rebuilding..."
-docker-compose exec bdt-frontend rm -rf node_modules/.cache || true
-docker-compose exec bdt-frontend npm run build || true
+docker-compose exec topsdraw-compass-frontend rm -rf node_modules/.cache || true
+docker-compose exec topsdraw-compass-frontend npm run build || true
 print_check "Starting frontend container..."
-docker-compose up -d bdt-frontend
+docker-compose up -d topsdraw-compass-frontend

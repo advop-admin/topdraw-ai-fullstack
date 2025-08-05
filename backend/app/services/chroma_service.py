@@ -54,8 +54,8 @@ class ChromaService:
                         self.collection = self.client.create_collection(
                             name=settings.chroma_collection_name,
                             metadata={
-                                "description": "QBurst project embeddings for proposal generation",
-                                "created_by": "Takumi.ai BDT Dashboard"
+                                "description": "Topsdraw Compass project embeddings for proposal generation",
+                                "created_by": "Topsdraw Compass Dashboard"
                             }
                         )
                         logger.info(f"Created new collection: {settings.chroma_collection_name}")
