@@ -11,11 +11,17 @@ class BlueprintEngine:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
         self.model = genai.GenerativeModel('gemini-1.5-pro')
         
-        # Initialize ChromaDB
-        self.chroma_client = chromadb.HttpClient(
-            host=os.getenv("CHROMA_HOST", "topsdraw-blueprint-chromadb"),
-            port=int(os.getenv("CHROMA_PORT", "8000"))
+        # Initialize ChromaDB with settings
+        settings = chromadb.Settings(
+            chroma_api_impl="rest",
+            chroma_server_host=os.getenv("CHROMA_HOST", "topsdraw-blueprint-chromadb"),
+            chroma_server_http_port=int(os.getenv("CHROMA_PORT", "8000")),
+            tenant_id="default_tenant",
+            database_id="default_database"
         )
+        
+        # Initialize client with settings
+        self.chroma_client = chromadb.Client(settings)
         
         # Create embedding function
         self.embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -52,6 +58,29 @@ class BlueprintEngine:
             
         except Exception as e:
             print(f"Error initializing ChromaDB collections: {e}")
+    
+    def load_industry_data(self):
+        """Load industry data into ChromaDB"""
+        try:
+            with open('../data/knowledge_base.json', 'r') as f:
+                knowledge_base = json.load(f)
+                
+            # Clear existing data
+            self.knowledge_collection.delete(where={})
+            
+            # Add new data
+            for entry in knowledge_base:
+                self.knowledge_collection.add(
+                    documents=[entry['content']],
+                    metadatas=[{
+                        "industry": entry.get('industry', ''),
+                        "type": entry.get('type', ''),
+                        "tags": entry.get('tags', [])
+                    }],
+                    ids=[f"k_{datetime.now().timestamp()}"]
+                )
+        except Exception as e:
+            print(f"Error loading industry data: {e}")
     
     async def generate_blueprint(self, project_idea: str, context: Dict) -> Dict:
         """Generate comprehensive AI-powered blueprint"""
@@ -207,4 +236,20 @@ class BlueprintEngine:
         Return as structured JSON.
         """
     
-    # Rest of the methods remain the same...
+    def _parse_ai_response(self, response: str) -> Dict:
+        """Parse and structure AI response"""
+        try:
+            # Basic parsing for now - can be enhanced
+            return json.loads(response)
+        except:
+            return {"error": "Failed to parse AI response"}
+    
+    def _add_creative_elements(self, blueprint: Dict, context: Dict) -> Dict:
+        """Add creative touches and regional insights"""
+        # This is a placeholder - implement actual logic
+        return blueprint
+    
+    def _calculate_estimates(self, blueprint: Dict, context: Dict) -> Dict:
+        """Calculate realistic timelines and budgets"""
+        # This is a placeholder - implement actual logic
+        return blueprint
